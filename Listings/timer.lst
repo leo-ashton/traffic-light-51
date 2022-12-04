@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   TIMER                                                             12/04/2022 14:51:21 PAGE 1   
+C51 COMPILER V9.60.0.0   TIMER                                                             12/04/2022 22:01:53 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TIMER
@@ -44,13 +44,12 @@ line level    source
   34   2              {
   35   3                  seconds = 0;
   36   3              }
-  37   2              RED_EAST = ~RED_EAST;
-  38   2          }
-  39   1      }
+  37   2          }
+  38   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     83    ----
+   CODE SIZE        =     81    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

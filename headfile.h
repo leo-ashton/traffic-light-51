@@ -6,5 +6,6 @@
 #include "timer.h"
 #include "alias.h"
 #include "global_vars.h"
+#include "traffic_light.h"
 
 #endif

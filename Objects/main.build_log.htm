@@ -26,13 +26,29 @@ Build target 'Target 1'
 compiling main.c...
 linking...
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
-    SEGMENT: ?PR?TRAFFIC_LIGHT?MAIN
+    SEGMENT: ?PR?_DELAYMS?MAIN
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
     SEGMENT: ?PR?TIMER1INIT?TIMER
-Program Size: data=37.0 xdata=0 code=499
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DISPLAYDIGIT?TRAFFIC_LIGHT
+*** WARNING L1: UNRESOLVED EXTERNAL SYMBOL
+    SYMBOL:  TRAFFICLIGHT
+    MODULE:  .\Objects\main.obj (MAIN)
+*** WARNING L1: UNRESOLVED EXTERNAL SYMBOL
+    SYMBOL:  SETTING
+    MODULE:  .\Objects\main.obj (MAIN)
+*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  TRAFFICLIGHT
+    MODULE:  .\Objects\main.obj (MAIN)
+    ADDRESS: 00ADH
+*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  SETTING
+    MODULE:  .\Objects\main.obj (MAIN)
+    ADDRESS: 00B6H
+Program Size: data=40.0 xdata=0 code=581
 creating hex file from ".\Objects\main.omf"...
-".\Objects\main.omf" - 0 Error(s), 2 Warning(s).
-Build Time Elapsed:  00:00:01
+".\Objects\main.omf" - 0 Error(s), 7 Warning(s).
+Build Time Elapsed:  00:00:00
 </pre>
 </body>
 </html>

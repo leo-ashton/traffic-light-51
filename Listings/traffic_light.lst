@@ -1,0 +1,77 @@
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/04/2022 22:01:53 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TRAFFIC_LIGHT
+OBJECT MODULE PLACED IN .\Objects\traffic_light.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE traffic_light.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\traffic_light.lst) TABS(2) OBJECT(.\Objects\traffic_light.obj)
+
+line level    source
+
+   1          #include "headfile.h"
+   2          
+   3          void Write7219(unsigned char address, unsigned char dat)
+   4          {
+   5   1          unsigned char i;
+   6   1          LOAD_7219 = 0; //拉低片选线，选中器件
+   7   1          //发送地址
+   8   1          for (i = 0; i < 8; i++) //移位循环8次
+   9   1          {
+  10   2              CLK_7219 = 0;                     //清零时钟总线
+  11   2              DIN_7219 = (bit)(address & 0x80); //每次取高字节
+  12   2              address <<= 1;                    //左移一位
+  13   2              CLK_7219 = 1;                     //时钟上升沿，发送地址
+  14   2          }
+  15   1          //发送数据
+  16   1          for (i = 0; i < 8; i++)
+  17   1          {
+  18   2              CLK_7219 = 0;
+  19   2              DIN_7219 = (bit)(dat & 0x80);
+  20   2              dat <<= 1;
+  21   2              CLK_7219 = 1; //时钟上升沿，发送数据
+  22   2          }
+  23   1          LOAD_7219 = 1; //发送结束，上升沿锁存数据
+  24   1      }
+  25          
+  26          // MAX7219初始化，设置MAX7219内部的控制寄存器
+  27          void Init7219(void)
+  28          {
+  29   1          Write7219(SHUT_DOWN, 0x01);    //开启正常工作模式（0xX1）
+  30   1          Write7219(DISPLAY_TEST, 0x00); //选择工作模式（0xX0）
+  31   1          Write7219(DECODE_MODE, 0xff);  //选用全译码模式
+  32   1          Write7219(SCAN_LIMIT, 0x07);   // 8只LED全用
+  33   1          Write7219(INTENSITY, 0x04);    //设置初始亮度
+  34   1      }
+  35          
+  36          void DisplayDigit(uchar val, direction dir)
+  37          {
+  38   1          if (dir == EAST)
+  39   1          {
+  40   2          }
+  41   1          if (dir == SOUTH)
+  42   1          {
+  43   2          }
+  44   1          if (dir == WEST)
+  45   1          {
+  46   2          }
+  47   1          if (dir == NORTH)
+  48   1          {
+  49   2          }
+  50   1      }
+*** WARNING C280 IN LINE 36 OF traffic_light.c: 'val': unreferenced local variable
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/04/2022 22:01:53 PAGE 2   
+
+   CODE SIZE        =     99    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

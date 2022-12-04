@@ -421,6 +421,16 @@
               <FileType>1</FileType>
               <FilePath>.\global_vars.c</FilePath>
             </File>
+            <File>
+              <FileName>traffic_light.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\traffic_light.h</FilePath>
+            </File>
+            <File>
+              <FileName>traffic_light.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\traffic_light.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

@@ -34,6 +34,5 @@ void UpdateTimer0()
         {
             seconds = 0;
         }
-        RED_EAST = ~RED_EAST;
     }
 }
