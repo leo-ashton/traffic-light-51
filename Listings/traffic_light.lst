@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/04/2022 22:01:53 PAGE 1   
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/05/2022 17:09:45 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TRAFFIC_LIGHT
@@ -10,68 +10,172 @@ line level    source
 
    1          #include "headfile.h"
    2          
-   3          void Write7219(unsigned char address, unsigned char dat)
-   4          {
-   5   1          unsigned char i;
-   6   1          LOAD_7219 = 0; //拉低片选线，选中器件
-   7   1          //发送地址
-   8   1          for (i = 0; i < 8; i++) //移位循环8次
-   9   1          {
-  10   2              CLK_7219 = 0;                     //清零时钟总线
-  11   2              DIN_7219 = (bit)(address & 0x80); //每次取高字节
-  12   2              address <<= 1;                    //左移一位
-  13   2              CLK_7219 = 1;                     //时钟上升沿，发送地址
-  14   2          }
-  15   1          //发送数据
-  16   1          for (i = 0; i < 8; i++)
-  17   1          {
-  18   2              CLK_7219 = 0;
-  19   2              DIN_7219 = (bit)(dat & 0x80);
-  20   2              dat <<= 1;
-  21   2              CLK_7219 = 1; //时钟上升沿，发送数据
-  22   2          }
-  23   1          LOAD_7219 = 1; //发送结束，上升沿锁存数据
-  24   1      }
-  25          
-  26          // MAX7219初始化，设置MAX7219内部的控制寄存器
-  27          void Init7219(void)
-  28          {
-  29   1          Write7219(SHUT_DOWN, 0x01);    //开启正常工作模式（0xX1）
-  30   1          Write7219(DISPLAY_TEST, 0x00); //选择工作模式（0xX0）
-  31   1          Write7219(DECODE_MODE, 0xff);  //选用全译码模式
-  32   1          Write7219(SCAN_LIMIT, 0x07);   // 8只LED全用
-  33   1          Write7219(INTENSITY, 0x04);    //设置初始亮度
-  34   1      }
-  35          
-  36          void DisplayDigit(uchar val, direction dir)
-  37          {
-  38   1          if (dir == EAST)
-  39   1          {
+   3          #define DONT_DISPLAY 255 // DisplayDigit函数的val为该值时，两位均不显示
+   4          #define SEG_OFF 15       // Write7219向某位数码管写入该值时，该位数码管不显示
+   5          
+   6          static uchar last_east, last_south, last_west, last_north;
+   7          static uchar last_display_val[4];
+   8          
+   9          typedef enum digs
+  10          {
+  11              EAST_TENS = 1,
+  12              EAST_ONES,
+  13              SOUTH_TENS,
+  14              SOUTH_ONES,
+  15              WEST_TENS,
+  16              WEST_ONES,
+  17              NORTH_TENS,
+  18              NORTH_ONES,
+  19          } digs;
+  20          
+  21          void Write7219(unsigned char address, unsigned char dat)
+  22          {
+  23   1          unsigned char i;
+  24   1          LOAD_7219 = 0; //拉低片选线，选中器件
+  25   1          //发送地址
+  26   1          for (i = 0; i < 8; i++) //移位循环8次
+  27   1          {
+  28   2              CLK_7219 = 0;                     //清零时钟总线
+  29   2              DIN_7219 = (bit)(address & 0x80); //每次取高字节
+  30   2              address <<= 1;                    //左移一位
+  31   2              CLK_7219 = 1;                     //时钟上升沿，发送地址
+  32   2          }
+  33   1          //发送数据
+  34   1          for (i = 0; i < 8; i++)
+  35   1          {
+  36   2              CLK_7219 = 0;
+  37   2              DIN_7219 = (bit)(dat & 0x80);
+  38   2              dat <<= 1;
+  39   2              CLK_7219 = 1; //时钟上升沿，发送数据
   40   2          }
-  41   1          if (dir == SOUTH)
-  42   1          {
-  43   2          }
-  44   1          if (dir == WEST)
-  45   1          {
-  46   2          }
-  47   1          if (dir == NORTH)
-  48   1          {
-  49   2          }
-  50   1      }
-*** WARNING C280 IN LINE 36 OF traffic_light.c: 'val': unreferenced local variable
+  41   1          LOAD_7219 = 1; //发送结束，上升沿锁存数据
+  42   1      }
+  43          
+  44          // MAX7219初始化，设置MAX7219内部的控制寄存器
+  45          void Init7219(void)
+  46          {
+  47   1          Write7219(SHUT_DOWN, 0x01);    //开启正常工作模式（0xX1）
+  48   1          Write7219(DISPLAY_TEST, 0x00); //选择工作模式（0xX0）
+  49   1          Write7219(DECODE_MODE, 0xff);  //选用全译码模式
+  50   1          Write7219(SCAN_LIMIT, 0x07);   // 8只LED全用
+  51   1          Write7219(INTENSITY, 0x04);    //设置初始亮度
+  52   1      }
+  53          
+  54          void DisplayDigit(uchar val, direction dir)
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/05/2022 17:09:45 PAGE 2   
+
+  55          {
+  56   1          // @brief 在dir方向展示val,并将本次显示的值保存在last_变量中
+  57   1          // @note  这是唯一允许调用数码管显示的方式
+  58   1          static uchar ones, tens;
+  59   1      
+  60   1          if (val == DONT_DISPLAY)
+  61   1          {
+  62   2              // 两位均不显示
+  63   2              ones = SEG_OFF;
+  64   2              tens = SEG_OFF;
+  65   2          }
+  66   1          else
+  67   1          {
+  68   2              ones = val % 10;
+  69   2              tens = (val / 10 % 10) == 0 ? SEG_OFF : (val / 10 % 10); // 如果十位为0，则不显示
+  70   2          }
+  71   1      
+  72   1          if (dir == EAST)
+  73   1          {
+  74   2              Write7219(EAST_ONES, ones);
+  75   2              Write7219(EAST_TENS, tens);
+  76   2          }
+  77   1          if (dir == SOUTH)
+  78   1          {
+  79   2              Write7219(SOUTH_ONES, ones);
+  80   2              Write7219(SOUTH_TENS, tens);
+  81   2          }
+  82   1          if (dir == WEST)
+  83   1          {
+  84   2              Write7219(WEST_ONES, ones);
+  85   2              Write7219(WEST_TENS, tens);
+  86   2          }
+  87   1          if (dir == NORTH)
+  88   1          {
+  89   2              Write7219(NORTH_ONES, ones);
+  90   2              Write7219(NORTH_TENS, tens);
+  91   2          }
+  92   1          if (val == DONT_DISPLAY)
+  93   1              last_display_val[dir] = last_display_val[dir];
+  94   1          else
+  95   1              last_display_val[dir] = val;
+  96   1      }
+  97          
+  98          void DisplayDigitDemo()
+  99          {
+ 100   1          Write7219(1, 1); // 15为全灭
+ 101   1          Write7219(2, 2);
+ 102   1          Write7219(3, 3);
+ 103   1          Write7219(4, 4);
+ 104   1          Write7219(5, 5);
+ 105   1          Write7219(6, 6);
+ 106   1          Write7219(7, 7);
+ 107   1          Write7219(8, 8);
+ 108   1          // Write7219(1, 15); // 15为全灭
+ 109   1      }
+ 110          
+ 111          void TrafficLight()
+ 112          {
+ 113   1      }
+ 114          
+ 115          void Setting()
+ 116          {
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/05/2022 17:09:45 PAGE 3   
+
+ 117   1          direction dir = NORTH;
+ 118   1          while (mode == SETTING)
+ 119   1          {
+ 120   2              ToggleSegs(dir);
+ 121   2              DelayMS(1000);
+ 122   2          }
+ 123   1          ClockReset();
+ 124   1      }
+ 125          
+ 126          void ClockReset()
+ 127          {
+ 128   1          // @brief 重置定时器0以及毫秒、秒计数器
+ 129   1          TR0 = 0;    //定时器0开始计时
+ 130   1          ET0 = 0;    // 关闭定时器0中断
+ 131   1          TL0 = 0x20; //设置定时初始值
+ 132   1          TH0 = 0xD1; //设置定时初始值
+ 133   1          milliseconds = 0;
+ 134   1          seconds = 0;
+ 135   1          ET0 = 1;
+ 136   1          TR0 = 1; //定时器0开始计时
+ 137   1      }
+ 138          
+ 139          void ToggleSegs(direction dir)
+ 140          {
+ 141   1          // @note: 向方向写入DONT_DISPLAY可以使数码管熄灭
+ 142   1          static uchar ON[4] = {1, 1, 1, 1}; // 4个方向的开关状态
+ 143   1          if (ON[dir] == 1)
+ 144   1          {
+ 145   2              DisplayDigit(DONT_DISPLAY, dir);
+ 146   2              ON[dir] = 0;
+ 147   2          }
+ 148   1          else
+ 149   1          {
+ 150   2              DisplayDigit(last_display_val[dir], dir);
+ 151   2              ON[dir] = 1;
+ 152   2          }
+ 153   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/04/2022 22:01:53 PAGE 2   
-
-   CODE SIZE        =     99    ----
+   CODE SIZE        =    382    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =   ----       2
+   DATA SIZE        =     14       1
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

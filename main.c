@@ -6,15 +6,6 @@ uchar Flash_Count = 0, Operation_Type = 1;								//闪烁次数，操作类型�
 uint i = 0;
 uint pre_second = 0;
 
-//延时
-void DelayMS(uint x)
-{
-	uchar i;
-	while (x--)
-		for (i = 0; i < 120; i++)
-			;
-}
-
 void InterruptKey() interrupt 0
 {
 	if (mode < FUNC_MAX)
@@ -40,6 +31,11 @@ void main()
 	ET0 = 1;
 	EX0 = 1; // 外部中断
 	Init7219();
+	DisplayDigit(1, EAST);
+	DisplayDigit(10, SOUTH);
+	DisplayDigit(50, WEST);
+	DisplayDigit(99, NORTH);
+	DelayMS(500);
 	while (1)
 	{
 		if (mode == RUNNING)
@@ -52,14 +48,12 @@ void main()
 		}
 		if (mode == DEBUGGING)
 		{
-			Write7219(1, 1);
-			Write7219(2, 2);
-			Write7219(3, 3);
-			Write7219(4, 4);
-			Write7219(5, 5);
-			Write7219(6, 6);
-			Write7219(7, 7);
-			Write7219(8, 8);
+			// DisplayDigitDemo();
+			ToggleSegs(NORTH);
+			ToggleSegs(SOUTH);
+			ToggleSegs(EAST);
+			ToggleSegs(WEST);
+			DelayMS(1000);
 		}
 	}
 }

@@ -7,5 +7,7 @@
 #include "alias.h"
 #include "global_vars.h"
 #include "traffic_light.h"
+#include "utilities.h"
+#include "string.h"
 
 #endif

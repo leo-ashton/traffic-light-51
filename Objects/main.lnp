@@ -2,6 +2,7 @@
 ".\Objects\main.obj",
 ".\Objects\timer.obj",
 ".\Objects\global_vars.obj",
-".\Objects\traffic_light.obj" 
+".\Objects\traffic_light.obj",
+".\Objects\utilities.obj" 
 TO ".\Objects\main.omf" 
 PRINT(".\Listings\main.m51") RAMSIZE(256) 
