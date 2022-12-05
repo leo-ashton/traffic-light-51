@@ -3,9 +3,6 @@
 #define DONT_DISPLAY 255 // DisplayDigit函数的val为该值时，两位均不显示
 #define SEG_OFF 15       // Write7219向某位数码管写入该值时，该位数码管不显示
 
-// static uchar last_east, last_south, last_west, last_north;
-static uchar last_display_val[4];
-
 typedef enum digs
 {
     EAST_TENS = 1,
@@ -17,6 +14,11 @@ typedef enum digs
     NORTH_TENS,
     NORTH_ONES,
 } digs;
+
+// static uchar last_east, last_south, last_west, last_north;
+static uchar last_display_val[4];
+const uchar ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
+const uchar TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
 
 void Write7219(unsigned char address, unsigned char dat)
 {
@@ -69,26 +71,9 @@ void DisplayDigit(uchar val, direction dir)
         tens = (val / 10 % 10) == 0 ? SEG_OFF : (val / 10 % 10); // 如果十位为0，则不显示
     }
 
-    if (dir == EAST)
-    {
-        Write7219(EAST_ONES, ones);
-        Write7219(EAST_TENS, tens);
-    }
-    if (dir == SOUTH)
-    {
-        Write7219(SOUTH_ONES, ones);
-        Write7219(SOUTH_TENS, tens);
-    }
-    if (dir == WEST)
-    {
-        Write7219(WEST_ONES, ones);
-        Write7219(WEST_TENS, tens);
-    }
-    if (dir == NORTH)
-    {
-        Write7219(NORTH_ONES, ones);
-        Write7219(NORTH_TENS, tens);
-    }
+    Write7219(ONES_BIT[dir], ones);
+    Write7219(TENS_BIT[dir], tens);
+
     if (val == DONT_DISPLAY)
         last_display_val[dir] = last_display_val[dir];
     else
