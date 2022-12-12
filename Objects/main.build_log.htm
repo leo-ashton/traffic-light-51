@@ -23,15 +23,25 @@ Project File Date:  12/05/2022
 
 <h2>Output:</h2>
 Build target 'Target 1'
+compiling main.c...
+compiling timer.c...
+compiling global_vars.c...
 compiling traffic_light.c...
+compiling utilities.c...
+utilities.c(69): warning C280: 'series': unreferenced local variable
+utilities.c(69): warning C280: 'len': unreferenced local variable
 linking...
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
     SEGMENT: ?PR?TIMER1INIT?TIMER
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
     SEGMENT: ?PR?DISPLAYDIGITDEMO?TRAFFIC_LIGHT
-Program Size: data=57.0 xdata=0 code=836
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_SERIALOUT595?UTILITIES
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_BINARYSERIES2UINT?UTILITIES
+Program Size: data=83.0 xdata=0 code=1012
 creating hex file from ".\Objects\main.omf"...
-".\Objects\main.omf" - 0 Error(s), 2 Warning(s).
+".\Objects\main.omf" - 0 Error(s), 6 Warning(s).
 Build Time Elapsed:  00:00:01
 </pre>
 </body>

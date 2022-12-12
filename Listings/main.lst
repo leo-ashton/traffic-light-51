@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MAIN                                                              12/05/2022 16:41:21 PAGE 1   
+C51 COMPILER V9.60.0.0   MAIN                                                              12/12/2022 11:44:47 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
@@ -11,8 +11,8 @@ line level    source
    1          #include "headfile.h"
    2          uchar digit_codes[] = {0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xf8,
    3                       0x80, 0x90, 0x88, 0x83, 0xc6, 0xa1, 0x86, 0x8e}; // 数码管段码
-   4          uchar Flash_Count = 0, Operation_Type = 1;                //闪烁次数，操作类型变量
-   5          
+   4          uchar Flash_Count = 0, Operation_Type = 1;                // 闪烁次数，操作类型变量
+   5          uchar out_series[] = {0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1};
    6          uint i = 0;
    7          uint pre_second = 0;
    8          
@@ -33,7 +33,7 @@ line level    source
   23   1        UpdateTimer0();
   24   1      }
   25          
-  26          //主程序
+  26          // 主程序
   27          void main()
   28          {
   29   1        Timer0Init();
@@ -58,25 +58,21 @@ line level    source
   48   3          }
   49   2          if (mode == DEBUGGING)
   50   2          {
-  51   3            // DisplayDigitDemo();
-  52   3            ToggleSegs(NORTH);
-  53   3            ToggleSegs(SOUTH);
-  54   3            ToggleSegs(EAST);
-C51 COMPILER V9.60.0.0   MAIN                                                              12/05/2022 16:41:21 PAGE 2   
+  51   3            Hc595SendByte(0xaa);
+  52   3            // SerialOut()
+  53   3          }
+  54   2        }
+C51 COMPILER V9.60.0.0   MAIN                                                              12/12/2022 11:44:47 PAGE 2   
 
-  55   3            ToggleSegs(WEST);
-  56   3            DelayMS(1000);
-  57   3          }
-  58   2        }
-  59   1      }
+  55   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    184    ----
+   CODE SIZE        =    162    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     22    ----
+   DATA SIZE        =     34    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

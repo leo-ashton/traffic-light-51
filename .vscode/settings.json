@@ -4,6 +4,7 @@
         "pins.h": "c",
         "alias.h": "c",
         "global_vars.h": "c",
-        "headfile.h": "c"
+        "headfile.h": "c",
+        "utilities.h": "c"
     }
 }

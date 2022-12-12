@@ -9,5 +9,6 @@
 #include "traffic_light.h"
 #include "utilities.h"
 #include "string.h"
+#include "intrins.h"
 
 #endif

@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/05/2022 17:58:54 PAGE 1   
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/12/2022 11:44:47 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TRAFFIC_LIGHT
@@ -27,8 +27,8 @@ line level    source
   17          
   18          // static uchar last_east, last_south, last_west, last_north;
   19          static uchar last_display_val[4];
-  20          const char ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
-  21          const char TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
+  20          const uchar ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
+  21          const uchar TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
   22          
   23          void Write7219(unsigned char address, unsigned char dat)
   24          {
@@ -62,7 +62,7 @@ line level    source
   52   1          Write7219(SCAN_LIMIT, 0x07);   // 8只LED全用
   53   1          Write7219(INTENSITY, 0x04);    //设置初始亮度
   54   1      }
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/05/2022 17:58:54 PAGE 2   
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/12/2022 11:44:47 PAGE 2   
 
   55          
   56          void DisplayDigit(uchar val, direction dir)
@@ -82,92 +82,74 @@ line level    source
   70   2              ones = val % 10;
   71   2              tens = (val / 10 % 10) == 0 ? SEG_OFF : (val / 10 % 10); // 如果十位为0，则不显示
   72   2          }
-  73   1          Write7219(ONES_BIT[dir], ones);
-  74   1          Write7219(TENS_BIT[dir], tens);
-  75   1          // if (dir == EAST)
-  76   1          // {
-  77   1          //     Write7219(EAST_ONES, ones);
-  78   1          //     Write7219(EAST_TENS, tens);
-  79   1          // }
-  80   1          // if (dir == SOUTH)
-  81   1          // {
-  82   1          //     Write7219(SOUTH_ONES, ones);
-  83   1          //     Write7219(SOUTH_TENS, tens);
-  84   1          // }
-  85   1          // if (dir == WEST)
-  86   1          // {
-  87   1          //     Write7219(WEST_ONES, ones);
-  88   1          //     Write7219(WEST_TENS, tens);
-  89   1          // }
-  90   1          // if (dir == NORTH)
-  91   1          // {
-  92   1          //     Write7219(NORTH_ONES, ones);
-  93   1          //     Write7219(NORTH_TENS, tens);
-  94   1          // }
-  95   1          if (val == DONT_DISPLAY)
-  96   1              last_display_val[dir] = last_display_val[dir];
-  97   1          else
-  98   1              last_display_val[dir] = val;
-  99   1      }
- 100          
- 101          void DisplayDigitDemo()
- 102          {
- 103   1          Write7219(1, 1); // 15为全灭
- 104   1          Write7219(2, 2);
- 105   1          Write7219(3, 3);
- 106   1          Write7219(4, 4);
- 107   1          Write7219(5, 5);
- 108   1          Write7219(6, 6);
- 109   1          Write7219(7, 7);
- 110   1          Write7219(8, 8);
- 111   1          // Write7219(1, 15); // 15为全灭
- 112   1      }
- 113          
- 114          void TrafficLight()
- 115          {
- 116   1      }
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/05/2022 17:58:54 PAGE 3   
+  73   1      
+  74   1          Write7219(ONES_BIT[dir], ones);
+  75   1          Write7219(TENS_BIT[dir], tens);
+  76   1      
+  77   1          if (val == DONT_DISPLAY)
+  78   1              last_display_val[dir] = last_display_val[dir];
+  79   1          else
+  80   1              last_display_val[dir] = val;
+  81   1      }
+  82          
+  83          void DisplayDigitDemo()
+  84          {
+  85   1          Write7219(1, 1); // 15为全灭
+  86   1          Write7219(2, 2);
+  87   1          Write7219(3, 3);
+  88   1          Write7219(4, 4);
+  89   1          Write7219(5, 5);
+  90   1          Write7219(6, 6);
+  91   1          Write7219(7, 7);
+  92   1          Write7219(8, 8);
+  93   1          // Write7219(1, 15); // 15为全灭
+  94   1      }
+  95          
+  96          void TrafficLight()
+  97          {
+  98   1      }
+  99          
+ 100          void Setting()
+ 101          {
+ 102   1          direction dir = NORTH;
+ 103   1          while (mode == SETTING)
+ 104   1          {
+ 105   2              ToggleSegs(dir);
+ 106   2              DelayMS(1000);
+ 107   2          }
+ 108   1          ClockReset();
+ 109   1      }
+ 110          
+ 111          void ClockReset()
+ 112          {
+ 113   1          // @brief 重置定时器0以及毫秒、秒计数器
+ 114   1          TR0 = 0;    //定时器0开始计时
+ 115   1          ET0 = 0;    // 关闭定时器0中断
+ 116   1          TL0 = 0x20; //设置定时初始值
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/12/2022 11:44:47 PAGE 3   
 
- 117          
- 118          void Setting()
- 119          {
- 120   1          direction dir = NORTH;
- 121   1          while (mode == SETTING)
- 122   1          {
- 123   2              ToggleSegs(dir);
- 124   2              DelayMS(1000);
- 125   2          }
- 126   1          ClockReset();
- 127   1      }
- 128          
- 129          void ClockReset()
- 130          {
- 131   1          // @brief 重置定时器0以及毫秒、秒计数器
- 132   1          TR0 = 0;    //定时器0开始计时
- 133   1          ET0 = 0;    // 关闭定时器0中断
- 134   1          TL0 = 0x20; //设置定时初始值
- 135   1          TH0 = 0xD1; //设置定时初始值
- 136   1          milliseconds = 0;
- 137   1          seconds = 0;
- 138   1          ET0 = 1;
- 139   1          TR0 = 1; //定时器0开始计时
- 140   1      }
- 141          
- 142          void ToggleSegs(direction dir)
- 143          {
- 144   1          // @note: 向方向写入DONT_DISPLAY可以使数码管熄灭
- 145   1          static uchar ON[4] = {1, 1, 1, 1}; // 4个方向的开关状态
- 146   1          if (ON[dir] == 1)
- 147   1          {
- 148   2              DisplayDigit(DONT_DISPLAY, dir);
- 149   2              ON[dir] = 0;
- 150   2          }
- 151   1          else
- 152   1          {
- 153   2              DisplayDigit(last_display_val[dir], dir);
- 154   2              ON[dir] = 1;
- 155   2          }
- 156   1      }
+ 117   1          TH0 = 0xD1; //设置定时初始值
+ 118   1          milliseconds = 0;
+ 119   1          seconds = 0;
+ 120   1          ET0 = 1;
+ 121   1          TR0 = 1; //定时器0开始计时
+ 122   1      }
+ 123          
+ 124          void ToggleSegs(direction dir)
+ 125          {
+ 126   1          // @note: 向方向写入DONT_DISPLAY可以使数码管熄灭
+ 127   1          static uchar ON[4] = {1, 1, 1, 1}; // 4个方向的开关状态
+ 128   1          if (ON[dir] == 1)
+ 129   1          {
+ 130   2              DisplayDigit(DONT_DISPLAY, dir);
+ 131   2              ON[dir] = 0;
+ 132   2          }
+ 133   1          else
+ 134   1          {
+ 135   2              DisplayDigit(last_display_val[dir], dir);
+ 136   2              ON[dir] = 1;
+ 137   2          }
+ 138   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
