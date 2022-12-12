@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/12/2022 20:10:29 PAGE 1   
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/12/2022 20:33:23 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TRAFFIC_LIGHT
@@ -62,7 +62,7 @@ line level    source
   52   1          Write7219(SCAN_LIMIT, 0x07);   // 8只LED全用
   53   1          Write7219(INTENSITY, 0x04);    //设置初始亮度
   54   1      }
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/12/2022 20:10:29 PAGE 2   
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/12/2022 20:33:23 PAGE 2   
 
   55          
   56          void DisplayDigit(uchar val, direction dir)
@@ -107,49 +107,50 @@ line level    source
   95          
   96          void TrafficLight()
   97          {
-  98   1      }
-  99          
- 100          void Setting()
- 101          {
- 102   1          direction dir = NORTH;
- 103   1          while (mode == SETTING)
- 104   1          {
- 105   2              ToggleSegs(dir);
- 106   2              DelayMS(1000);
- 107   2          }
- 108   1          ClockReset();
- 109   1      }
- 110          
- 111          void ClockReset()
- 112          {
- 113   1          // @brief 重置定时器0以及毫秒、秒计数器
- 114   1          TR0 = 0;    //定时器0开始计时
- 115   1          ET0 = 0;    // 关闭定时器0中断
- 116   1          TL0 = 0x20; //设置定时初始值
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/12/2022 20:10:29 PAGE 3   
+  98   1      
+  99   1      }
+ 100          
+ 101          void Setting()
+ 102          {
+ 103   1          direction dir = NORTH;
+ 104   1          while (mode == SETTING)
+ 105   1          {
+ 106   2              ToggleSegs(dir);
+ 107   2              DelayMS(1000);
+ 108   2          }
+ 109   1          ClockReset();
+ 110   1      }
+ 111          
+ 112          void ClockReset()
+ 113          {
+ 114   1          // @brief 重置定时器0以及毫秒、秒计数器
+ 115   1          TR0 = 0;    //定时器0开始计时
+ 116   1          ET0 = 0;    // 关闭定时器0中断
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/12/2022 20:33:23 PAGE 3   
 
- 117   1          TH0 = 0xD1; //设置定时初始值
- 118   1          milliseconds = 0;
- 119   1          seconds = 0;
- 120   1          ET0 = 1;
- 121   1          TR0 = 1; //定时器0开始计时
- 122   1      }
- 123          
- 124          void ToggleSegs(direction dir)
- 125          {
- 126   1          // @note: 向方向写入DONT_DISPLAY可以使数码管熄灭
- 127   1          static uchar ON[4] = {1, 1, 1, 1}; // 4个方向的开关状态
- 128   1          if (ON[dir] == 1)
- 129   1          {
- 130   2              DisplayDigit(DONT_DISPLAY, dir);
- 131   2              ON[dir] = 0;
- 132   2          }
- 133   1          else
- 134   1          {
- 135   2              DisplayDigit(last_display_val[dir], dir);
- 136   2              ON[dir] = 1;
- 137   2          }
- 138   1      }
+ 117   1          TL0 = 0x20; //设置定时初始值
+ 118   1          TH0 = 0xD1; //设置定时初始值
+ 119   1          milliseconds = 0;
+ 120   1          seconds = 0;
+ 121   1          ET0 = 1;
+ 122   1          TR0 = 1; //定时器0开始计时
+ 123   1      }
+ 124          
+ 125          void ToggleSegs(direction dir)
+ 126          {
+ 127   1          // @note: 向方向写入DONT_DISPLAY可以使数码管熄灭
+ 128   1          static uchar ON[4] = {1, 1, 1, 1}; // 4个方向的开关状态
+ 129   1          if (ON[dir] == 1)
+ 130   1          {
+ 131   2              DisplayDigit(DONT_DISPLAY, dir);
+ 132   2              ON[dir] = 0;
+ 133   2          }
+ 134   1          else
+ 135   1          {
+ 136   2              DisplayDigit(last_display_val[dir], dir);
+ 137   2              ON[dir] = 1;
+ 138   2          }
+ 139   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE

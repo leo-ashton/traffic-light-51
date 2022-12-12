@@ -36,7 +36,11 @@ void main()
 	DisplayDigit(10, SOUTH);
 	DisplayDigit(50, WEST);
 	DisplayDigit(99, NORTH);
-	out_series[EAST_RED] = 1;
+
+	SetLedBit(NORTH_RED, LED_OFF);
+	SetLedBit(NORTH_YELLOW, LED_OFF);
+	SetLedBit(NORTH_GREEN, LED_ON);
+
 	DelayMS(500);
 	while (1)
 	{
@@ -50,10 +54,12 @@ void main()
 		}
 		if (mode == DEBUGGING)
 		{
-			out_series[EAST_RED] = 1;
-			foo = BinarySeries2ushort(out_series,
-									  sizeof(out_series) / sizeof(out_series[0]));
-			Hc595SendMultiByte((ushort)foo);
+			ToggleLedBit(SOUTH_YELLOW);
+			DelayMS(500);
+			// out_series[EAST_RED] = 1;
+			// foo = BinarySeries2ushort(out_series,
+			// 						  sizeof(out_series) / sizeof(out_series[0]));
+			// Hc595SendMultiByte((ushort)foo);
 		}
 	}
 }

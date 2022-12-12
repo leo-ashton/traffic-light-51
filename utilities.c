@@ -62,6 +62,17 @@ void SetLedBit(LEDs led, bit status)
      * @param led 枚举类型变量，操作的LED位
      */
     led_status[led] = status;
+    Hc595SendMultiByte(
+        BinarySeries2ushort(led_status,
+                            sizeof(led_status) / sizeof(led_status[0])));
+    // last_led_status[led] = status;
+}
 
-    last_led_status[led] = status;
+void ToggleLedBit(LEDs led)
+{
+    led_status[led] = !led_status[led];
+    Hc595SendMultiByte(
+        BinarySeries2ushort(led_status,
+                            sizeof(led_status) / sizeof(led_status[0])));
+    // last_led_status[led] = led_status[led];
 }

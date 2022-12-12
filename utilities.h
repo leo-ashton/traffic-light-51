@@ -9,5 +9,6 @@ void DelayMS(uint x);
 void Hc595SendMultiByte(unsigned short dat);
 ushort BinarySeries2ushort(uchar series[], uchar len);
 void SetLedBit(LEDs led, bit status);
+void ToggleLedBit(LEDs led);
 
 #endif

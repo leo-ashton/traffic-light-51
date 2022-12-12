@@ -10,6 +10,7 @@ typedef enum func
     DEBUGGING,
     RUNNING,
     SETTING,
+    EMERGENCY,
     FUNC_MAX
 } func;
 

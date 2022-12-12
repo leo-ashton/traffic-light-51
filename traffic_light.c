@@ -95,6 +95,7 @@ void DisplayDigitDemo()
 
 void TrafficLight()
 {
+
 }
 
 void Setting()
