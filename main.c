@@ -2,9 +2,10 @@
 uchar digit_codes[] = {0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xf8,
 					   0x80, 0x90, 0x88, 0x83, 0xc6, 0xa1, 0x86, 0x8e}; // 数码管段码
 uchar Flash_Count = 0, Operation_Type = 1;								// 闪烁次数，操作类型变量
-uchar out_series[] = {0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1};
+uchar out_series[HC595_CNT * 8] = {0};
 uint i = 0;
 uint pre_second = 0;
+ushort foo = 0;
 
 void InterruptKey() interrupt 0
 {
@@ -35,6 +36,7 @@ void main()
 	DisplayDigit(10, SOUTH);
 	DisplayDigit(50, WEST);
 	DisplayDigit(99, NORTH);
+	out_series[EAST_RED] = 1;
 	DelayMS(500);
 	while (1)
 	{
@@ -48,8 +50,10 @@ void main()
 		}
 		if (mode == DEBUGGING)
 		{
-			Hc595SendByte(0xaa);
-			// SerialOut()
+			out_series[EAST_RED] = 1;
+			foo = BinarySeries2ushort(out_series,
+									  sizeof(out_series) / sizeof(out_series[0]));
+			Hc595SendMultiByte((ushort)foo);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   UTILITIES                                                         12/12/2022 11:44:48 PAGE 1   
+C51 COMPILER V9.60.0.0   UTILITIES                                                         12/12/2022 17:32:39 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE UTILITIES
@@ -10,92 +10,78 @@ line level    source
 
    1          #include "headfile.h"
    2          // 延时
-   3          void DelayMS(uint x)
-   4          {
-   5   1          uchar i;
-   6   1          while (x--)
-   7   1              for (i = 0; i < 120; i++)
-   8   1                  ;
-   9   1      }
-  10          
-  11          void SerialOut595(char ds_pin, char sh_pin, char st_pin, uchar series[], int len)
-  12          {
-  13   1          /**
-  14   1           * @brief 向74HC595输入series指定的数据
-  15   1           * @param ds_pin 74HC595的串行数据输入端
-  16   1           * @param sh_pin 74HC595的串行输入端的时钟信号线,每载入一位,使用一个上升沿将�
-             -��位移入锁存器中
-  17   1           *
-  18   1           */
-  19   1          // @brief: 向74HC595输入series指定的数据
-  20   1          // @param: ds_pin
-  21   1          uint i = 0;
-  22   1          for (i = 0; i < len; i++)
-  23   1          {
-  24   2              ds_pin = series[i] & 0x01;
-  25   2              sh_pin = 0;
-  26   2              Delay100us();
-  27   2              sh_pin = 1;
-  28   2              sh_pin = 0; // 产生一个上升沿
-  29   2          }
-  30   1          st_pin = 0;
-  31   1          Delay100us();
-  32   1          st_pin = 1; // 产生一个上升沿
-  33   1          st_pin = 0;
-  34   1      }
-  35          
-  36          void Delay100us() //@12.000MHz
-  37          {
-  38   1          unsigned char i;
-  39   1      
-  40   1          _nop_();
-  41   1          i = 47;
-  42   1          while (--i)
-  43   1              ;
-  44   1      }
-  45          
-  46          void Hc595SendByte(uchar dat)
-  47          {
-  48   1          uchar a;
-  49   1      
-  50   1          SRCLK = 1;
-  51   1          RCLK = 1;
-  52   1      
-  53   1          for (a = 0; a < 8; a++) // 发送8位数
-C51 COMPILER V9.60.0.0   UTILITIES                                                         12/12/2022 11:44:48 PAGE 2   
+   3          static uchar last_led_status[HC595_CNT * 8];
+   4          
+   5          void DelayMS(uint x)
+   6          {
+   7   1          uchar i;
+   8   1          while (x--)
+   9   1              for (i = 0; i < 120; i++)
+  10   1                  ;
+  11   1      }
+  12          
+  13          void Hc595SendMultiByte(unsigned short dat)
+  14          {
+  15   1          /**
+  16   1           * @brief 向HC595发送数据，并并行输出；dat的高8位在第二块HC595（东边的三个灯
+             -所在的那片），低8位在第一块HC595
+  17   1           */
+  18   1          uchar a;
+  19   1      
+  20   1          SRCLK = 1;
+  21   1          RCLK = 1;
+  22   1      
+  23   1          for (a = 0; a < sizeof(dat) * 8; a++) // 发送8位数
+  24   1          {
+  25   2              SER = dat >> ((sizeof(dat) * 8) - 1); // 从最高位开始发送
+  26   2              dat <<= 1;
+  27   2      
+  28   2              SRCLK = 0; // 发送时序
+  29   2              _nop_();
+  30   2              _nop_();
+  31   2              SRCLK = 1;
+  32   2          }
+  33   1          RCLK = 0;
+  34   1          _nop_();
+  35   1          _nop_();
+  36   1          RCLK = 1;
+  37   1      }
+  38          
+  39          unsigned short BinarySeries2ushort(uchar series[], uchar len)
+  40          {
+  41   1          /**
+  42   1           * @brief 将二进制序列数组转换为对应的十进制数
+  43   1           * @param series 高位在前的二进制序列
+  44   1           * @return 转换的十进制数
+  45   1           */
+  46   1          // TODO implement this
+  47   1          static ushort i, ret;
+  48   1      
+  49   1          for (i = 0, ret = 0; i < len; i++)
+  50   1          {
+  51   2              ret += (series[i] << i);
+  52   2          }
+  53   1      
+C51 COMPILER V9.60.0.0   UTILITIES                                                         12/12/2022 17:32:39 PAGE 2   
 
-  54   1          {
-  55   2              SER = dat >> 7; // 从最高位开始发送
-  56   2              dat <<= 1;
-  57   2      
-  58   2              SRCLK = 0; // 发送时序
-  59   2              _nop_();
-  60   2              _nop_();
-  61   2              SRCLK = 1;
-  62   2          }
-  63   1          RCLK = 0;
-  64   1          _nop_();
-  65   1          _nop_();
-  66   1          RCLK = 1;
-  67   1      }
-  68          
-  69          uint BinarySeries2Uint(uchar series[], uchar len)
-  70          {
-  71   1          // TODO implement this
-  72   1          return 0;
-  73   1      }
-*** WARNING C280 IN LINE 69 OF utilities.c: 'series': unreferenced local variable
-*** WARNING C280 IN LINE 69 OF utilities.c: 'len': unreferenced local variable
+  54   1          return ret;
+  55   1      }
+  56          
+  57          void SetLedBit(LEDs led, bit status)
+  58          {
+  59   1      }
+*** WARNING C280 IN LINE 57 OF utilities.c: 'led': unreferenced local variable
+*** WARNING C280 IN LINE 57 OF utilities.c: 'status': unreferenced local variable
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    165    ----
+   CODE SIZE        =    163    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =   ----      14
+   DATA SIZE        =     20       4
    IDATA SIZE       =   ----    ----
-   BIT SIZE         =   ----    ----
+   BIT SIZE         =   ----       1
 END OF MODULE INFORMATION.
 
 

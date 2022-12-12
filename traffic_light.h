@@ -24,5 +24,6 @@ void DisplayDigit(uchar val, direction dir);
 void DisplayDigitDemo();
 void ClockReset();
 void ToggleSegs(direction dir);
+void DisplayLight(uchar light_status[]);
 
 #endif

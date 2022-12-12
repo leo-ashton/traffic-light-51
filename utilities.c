@@ -1,5 +1,8 @@
 #include "headfile.h"
-// 延时
+
+static uchar last_led_status[HC595_CNT * 8];
+static uchar led_status[TRAFFIC_LIGHT_MAX];
+
 void DelayMS(uint x)
 {
     uchar i;
@@ -8,51 +11,19 @@ void DelayMS(uint x)
             ;
 }
 
-void SerialOut595(char ds_pin, char sh_pin, char st_pin, uchar series[], int len)
+void Hc595SendMultiByte(unsigned short dat)
 {
     /**
-     * @brief 向74HC595输入series指定的数据
-     * @param ds_pin 74HC595的串行数据输入端
-     * @param sh_pin 74HC595的串行输入端的时钟信号线,每载入一位,使用一个上升沿将该位移入锁存器中
-     *
+     * @brief 向HC595发送数据，并并行输出；dat的高8位在第二块HC595（东边的三个灯所在的那片），低8位在第一块HC595
      */
-    // @brief: 向74HC595输入series指定的数据
-    // @param: ds_pin
-    uint i = 0;
-    for (i = 0; i < len; i++)
-    {
-        ds_pin = series[i] & 0x01;
-        sh_pin = 0;
-        Delay100us();
-        sh_pin = 1;
-        sh_pin = 0; // 产生一个上升沿
-    }
-    st_pin = 0;
-    Delay100us();
-    st_pin = 1; // 产生一个上升沿
-    st_pin = 0;
-}
-
-void Delay100us() //@12.000MHz
-{
-    unsigned char i;
-
-    _nop_();
-    i = 47;
-    while (--i)
-        ;
-}
-
-void Hc595SendByte(uchar dat)
-{
     uchar a;
 
     SRCLK = 1;
     RCLK = 1;
 
-    for (a = 0; a < 8; a++) // 发送8位数
+    for (a = 0; a < sizeof(dat) * 8; a++) // 发送8位数
     {
-        SER = dat >> 7; // 从最高位开始发送
+        SER = dat >> ((sizeof(dat) * 8) - 1); // 从最高位开始发送
         dat <<= 1;
 
         SRCLK = 0; // 发送时序
@@ -66,8 +37,31 @@ void Hc595SendByte(uchar dat)
     RCLK = 1;
 }
 
-uint BinarySeries2Uint(uchar series[], uchar len)
+unsigned short BinarySeries2ushort(uchar series[], uchar len)
 {
+    /**
+     * @brief 将二进制序列数组转换为对应的十进制数
+     * @param series 高位在前的二进制序列
+     * @return 转换的十进制数
+     */
     // TODO implement this
-    return 0;
+    static ushort i, ret;
+
+    for (i = 0, ret = 0; i < len; i++)
+    {
+        ret += (series[i] << i);
+    }
+
+    return ret;
+}
+
+void SetLedBit(LEDs led, bit status)
+{
+    /**
+     * @brief 设置某位LED的状态。这是唯一允许的操作LED的方式。
+     * @param led 枚举类型变量，操作的LED位
+     */
+    led_status[led] = status;
+
+    last_led_status[led] = status;
 }
