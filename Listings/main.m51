@@ -1,4 +1,4 @@
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    12/12/2022  17:34:32  PAGE 1
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    12/12/2022  20:10:30  PAGE 1
 
 
 BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
@@ -28,22 +28,21 @@ LINK MAP OF MODULE:  .\Objects\main.omf (?C_STARTUP)
 
             * * * * * * *   D A T A   M E M O R Y   * * * * * * *
             REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
-            DATA    0008H     0014H     UNIT         ?DT?UTILITIES
-            DATA    001CH     0003H     UNIT         _DATA_GROUP_
-            DATA    001FH     0001H     UNIT         ?DT?_SETLEDBIT?UTILITIES
+            DATA    0008H     0012H     UNIT         ?DT?TRAFFIC_LIGHT
+            DATA    001AH     0003H     UNIT         _DATA_GROUP_
+                    001DH     0003H                  *** GAP ***
             BIT     0020H.0   0000H.1   UNIT         ?BI?_SETLEDBIT?UTILITIES
                     0020H.1   0000H.7                *** GAP ***
             DATA    0021H     0028H     UNIT         ?DT?MAIN
-            DATA    0049H     0012H     UNIT         ?DT?TRAFFIC_LIGHT
-            DATA    005BH     0007H     UNIT         ?DT?GLOBAL_VARS
-            IDATA   0062H     0001H     UNIT         ?STACK
+            DATA    0049H     0020H     UNIT         ?DT?UTILITIES
+            DATA    0069H     0007H     UNIT         ?DT?GLOBAL_VARS
+            IDATA   0070H     0001H     UNIT         ?STACK
 
             * * * * * * *   C O D E   M E M O R Y   * * * * * * *
             CODE    0000H     0003H     ABSOLUTE     
             CODE    0003H     0003H     ABSOLUTE     
-            CODE    0006H     0003H     UNIT         ?PR?_SETLEDBIT?UTILITIES
-            CODE    0009H     0001H     UNIT         ?PR?TRAFFICLIGHT?TRAFFIC_LIGHT
-                    000AH     0001H                  *** GAP ***
+            CODE    0006H     0001H     UNIT         ?PR?TRAFFICLIGHT?TRAFFIC_LIGHT
+                    0007H     0004H                  *** GAP ***
             CODE    000BH     0003H     ABSOLUTE     
             CODE    000EH     008CH     UNIT         ?C_C51STARTUP
             CODE    009AH     005EH     UNIT         ?PR?MAIN?MAIN
@@ -59,14 +58,15 @@ LINK MAP OF MODULE:  .\Objects\main.omf (?C_STARTUP)
             CODE    033CH     002BH     UNIT         ?PR?_TOGGLESEGS?TRAFFIC_LIGHT
             CODE    0367H     0023H     UNIT         ?PR?INIT7219?TRAFFIC_LIGHT
             CODE    038AH     001BH     UNIT         ?PR?INTERRUPTKEY?MAIN
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  17:34:32  PAGE 2
-
-
             CODE    03A5H     001AH     UNIT         ?PR?SETTING?TRAFFIC_LIGHT
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  20:10:30  PAGE 2
+
+
             CODE    03BFH     001AH     UNIT         ?PR?_DELAYMS?UTILITIES
             CODE    03D9H     0018H     UNIT         ?PR?CLOCKRESET?TRAFFIC_LIGHT
-            CODE    03F1H     000EH     UNIT         ?PR?TIMER0INIT?TIMER
-            CODE    03FFH     000EH     UNIT         ?PR?TIMER1INIT?TIMER
+            CODE    03F1H     0012H     UNIT         ?PR?_SETLEDBIT?UTILITIES
+            CODE    0403H     000EH     UNIT         ?PR?TIMER0INIT?TIMER
+            CODE    0411H     000EH     UNIT         ?PR?TIMER1INIT?TIMER
 
 
 
@@ -96,7 +96,7 @@ SEGMENT                                      DATA_GROUP
 ?PR?_DISPLAYDIGIT?TRAFFIC_LIGHT            -----    -----
   +--> ?PR?_WRITE7219?TRAFFIC_LIGHT
 
-?PR?SETTING?TRAFFIC_LIGHT                  001CH    0001H
+?PR?SETTING?TRAFFIC_LIGHT                  001AH    0001H
   +--> ?PR?_TOGGLESEGS?TRAFFIC_LIGHT
   +--> ?PR?_DELAYMS?UTILITIES
   +--> ?PR?CLOCKRESET?TRAFFIC_LIGHT
@@ -104,7 +104,7 @@ SEGMENT                                      DATA_GROUP
 ?PR?_TOGGLESEGS?TRAFFIC_LIGHT              -----    -----
   +--> ?PR?_DISPLAYDIGIT?TRAFFIC_LIGHT
 
-?PR?_BINARYSERIES2USHORT?UTILITIES         001CH    0003H
+?PR?_BINARYSERIES2USHORT?UTILITIES         001AH    0003H
 
 *** NEW ROOT ***************************************************
 
@@ -119,11 +119,11 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   ----------------------------------
 
   -------         MODULE        ?C_STARTUP
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  17:34:32  PAGE 3
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  20:10:30  PAGE 3
 
 
   C:000EH         SEGMENT       ?C_C51STARTUP
-  I:0062H         SEGMENT       ?STACK
+  I:0070H         SEGMENT       ?STACK
   C:0000H         PUBLIC        ?C_STARTUP
   D:00E0H         SYMBOL        ACC
   D:00F0H         SYMBOL        B
@@ -179,7 +179,7 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   C:0399H         LINE#         13
   C:0399H         LINE#         14
   C:039BH         LINE#         15
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  17:34:32  PAGE 4
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  20:10:30  PAGE 4
 
 
   C:039DH         LINE#         17
@@ -234,12 +234,12 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   C:02DAH         PUBLIC        UpdateTimer0
   D:0089H         PUBLIC        TMOD
   B:0088H.5       PUBLIC        TF0
-  C:03F1H         PUBLIC        Timer0Init
+  C:0403H         PUBLIC        Timer0Init
   B:0088H.7       PUBLIC        TF1
-  C:03FFH         PUBLIC        Timer1Init
+  C:0411H         PUBLIC        Timer1Init
   D:008CH         PUBLIC        TH0
   D:008DH         PUBLIC        TH1
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  17:34:32  PAGE 5
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  20:10:30  PAGE 5
 
 
   D:008AH         PUBLIC        TL0
@@ -247,24 +247,24 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   B:0088H.4       PUBLIC        TR0
   B:0088H.6       PUBLIC        TR1
   -------         PROC          TIMER0INIT
-  C:03F1H         LINE#         3
-  C:03F1H         LINE#         4
-  C:03F1H         LINE#         6
-  C:03F4H         LINE#         7
-  C:03F7H         LINE#         8
-  C:03FAH         LINE#         9
-  C:03FCH         LINE#         10
-  C:03FEH         LINE#         11
+  C:0403H         LINE#         3
+  C:0403H         LINE#         4
+  C:0403H         LINE#         6
+  C:0406H         LINE#         7
+  C:0409H         LINE#         8
+  C:040CH         LINE#         9
+  C:040EH         LINE#         10
+  C:0410H         LINE#         11
   -------         ENDPROC       TIMER0INIT
   -------         PROC          TIMER1INIT
-  C:03FFH         LINE#         13
-  C:03FFH         LINE#         14
-  C:03FFH         LINE#         15
-  C:0402H         LINE#         16
-  C:0405H         LINE#         17
-  C:0408H         LINE#         18
-  C:040AH         LINE#         19
-  C:040CH         LINE#         20
+  C:0411H         LINE#         13
+  C:0411H         LINE#         14
+  C:0411H         LINE#         15
+  C:0414H         LINE#         16
+  C:0417H         LINE#         17
+  C:041AH         LINE#         18
+  C:041CH         LINE#         19
+  C:041EH         LINE#         20
   -------         ENDPROC       TIMER1INIT
   -------         PROC          UPDATETIMER0
   C:02DAH         LINE#         22
@@ -290,24 +290,24 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   D:0080H         PUBLIC        P0
   D:00A0H         PUBLIC        P2
   D:00B0H         PUBLIC        P3
-  D:005BH         PUBLIC        milliseconds
-  D:005DH         PUBLIC        cycle
-  D:005FH         PUBLIC        mode
-  D:0060H         PUBLIC        seconds
+  D:0069H         PUBLIC        milliseconds
+  D:006BH         PUBLIC        cycle
+  D:006DH         PUBLIC        mode
+  D:006EH         PUBLIC        seconds
   -------         ENDMOD        GLOBAL_VARS
 
   -------         MODULE        TRAFFIC_LIGHT
   C:0000H         SYMBOL        _ICE_DUMMY_
   D:0080H         PUBLIC        P0
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  17:34:32  PAGE 6
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  20:10:30  PAGE 6
 
 
   D:00A0H         PUBLIC        P2
   D:00B0H         PUBLIC        P3
   B:00A0H.2       PUBLIC        CLK_7219
   B:00A0H.0       PUBLIC        DIN_7219
-  D:004FH         SYMBOL        last_display_val
-  C:0009H         PUBLIC        TrafficLight
+  D:000EH         SYMBOL        last_display_val
+  C:0006H         PUBLIC        TrafficLight
   B:00A8H.1       PUBLIC        ET0
   D:008CH         PUBLIC        TH0
   C:0150H         PUBLIC        _DisplayDigit
@@ -319,9 +319,9 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   C:03A5H         PUBLIC        Setting
   C:0367H         PUBLIC        Init7219
   C:03D9H         PUBLIC        ClockReset
-  D:0053H         PUBLIC        ONES_BIT
+  D:0012H         PUBLIC        ONES_BIT
   C:033CH         PUBLIC        _ToggleSegs
-  D:0057H         PUBLIC        TENS_BIT
+  D:0016H         PUBLIC        TENS_BIT
   -------         PROC          _WRITE7219
   D:0007H         SYMBOL        address
   D:0005H         SYMBOL        dat
@@ -359,13 +359,13 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   -------         ENDPROC       INIT7219
   -------         PROC          _DISPLAYDIGIT
   D:0004H         SYMBOL        val
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  17:34:32  PAGE 7
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  20:10:30  PAGE 7
 
 
   D:0003H         SYMBOL        dir
   -------         DO            
-  D:0049H         SYMBOL        ones
-  D:004AH         SYMBOL        tens
+  D:0008H         SYMBOL        ones
+  D:0009H         SYMBOL        tens
   -------         ENDDO         
   C:0150H         LINE#         56
   C:0154H         LINE#         57
@@ -398,13 +398,13 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   C:029DH         LINE#         92
   -------         ENDPROC       DISPLAYDIGITDEMO
   -------         PROC          TRAFFICLIGHT
-  C:0009H         LINE#         96
-  C:0009H         LINE#         97
-  C:0009H         LINE#         98
+  C:0006H         LINE#         96
+  C:0006H         LINE#         97
+  C:0006H         LINE#         98
   -------         ENDPROC       TRAFFICLIGHT
   -------         PROC          SETTING
   -------         DO            
-  D:001CH         SYMBOL        dir
+  D:001AH         SYMBOL        dir
   -------         ENDDO         
   C:03A5H         LINE#         100
   C:03A5H         LINE#         101
@@ -419,7 +419,7 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   -------         PROC          CLOCKRESET
   C:03D9H         LINE#         111
   C:03D9H         LINE#         112
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  17:34:32  PAGE 8
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  20:10:30  PAGE 8
 
 
   C:03D9H         LINE#         114
@@ -435,7 +435,7 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   -------         PROC          _TOGGLESEGS
   D:0002H         SYMBOL        dir
   -------         DO            
-  D:004BH         SYMBOL        ON
+  D:000AH         SYMBOL        ON
   -------         ENDDO         
   C:033CH         LINE#         124
   C:033EH         LINE#         125
@@ -462,69 +462,72 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
   C:03BFH         PUBLIC        _DelayMS
   B:0080H.2       PUBLIC        RCLK
   C:01A6H         PUBLIC        _BinarySeries2ushort
-  D:000CH         SYMBOL        last_led_status
-  C:0006H         PUBLIC        _SetLedBit
+  D:004DH         SYMBOL        led_status
+  D:0059H         SYMBOL        last_led_status
+  C:03F1H         PUBLIC        _SetLedBit
   B:0080H.0       PUBLIC        SER
   -------         PROC          _DELAYMS
   D:0006H         SYMBOL        x
   -------         DO            
   D:0005H         SYMBOL        i
   -------         ENDDO         
-  C:03BFH         LINE#         5
   C:03BFH         LINE#         6
-  C:03BFH         LINE#         8
-  C:03C9H         LINE#         9
-  C:03D8H         LINE#         11
+  C:03BFH         LINE#         7
+  C:03BFH         LINE#         9
+  C:03C9H         LINE#         10
+  C:03D8H         LINE#         12
   -------         ENDPROC       _DELAYMS
   -------         PROC          _HC595SENDMULTIBYTE
   D:0002H         SYMBOL        dat
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  20:10:30  PAGE 9
+
+
   -------         DO            
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  17:34:32  PAGE 9
-
-
   D:0005H         SYMBOL        a
   -------         ENDDO         
-  C:02A4H         LINE#         13
-  C:02A8H         LINE#         14
-  C:02A8H         LINE#         20
-  C:02AAH         LINE#         21
-  C:02ACH         LINE#         23
-  C:02B8H         LINE#         24
+  C:02A4H         LINE#         14
+  C:02A8H         LINE#         15
+  C:02A8H         LINE#         21
+  C:02AAH         LINE#         22
+  C:02ACH         LINE#         24
   C:02B8H         LINE#         25
-  C:02C3H         LINE#         26
-  C:02CAH         LINE#         28
-  C:02CCH         LINE#         29
-  C:02CDH         LINE#         30
-  C:02CEH         LINE#         31
-  C:02D0H         LINE#         32
-  C:02D3H         LINE#         33
-  C:02D5H         LINE#         34
-  C:02D6H         LINE#         35
-  C:02D7H         LINE#         36
-  C:02D9H         LINE#         37
+  C:02B8H         LINE#         26
+  C:02C3H         LINE#         27
+  C:02CAH         LINE#         29
+  C:02CCH         LINE#         30
+  C:02CDH         LINE#         31
+  C:02CEH         LINE#         32
+  C:02D0H         LINE#         33
+  C:02D3H         LINE#         34
+  C:02D5H         LINE#         35
+  C:02D6H         LINE#         36
+  C:02D7H         LINE#         37
+  C:02D9H         LINE#         38
   -------         ENDPROC       _HC595SENDMULTIBYTE
   -------         PROC          _BINARYSERIES2USHORT
-  D:001CH         SYMBOL        series
+  D:001AH         SYMBOL        series
   D:0005H         SYMBOL        len
   -------         DO            
-  D:0008H         SYMBOL        i
-  D:000AH         SYMBOL        ret
+  D:0049H         SYMBOL        i
+  D:004BH         SYMBOL        ret
   -------         ENDDO         
-  C:01A6H         LINE#         39
-  C:01ACH         LINE#         40
-  C:01ACH         LINE#         49
-  C:01C1H         LINE#         50
+  C:01A6H         LINE#         40
+  C:01ACH         LINE#         41
+  C:01ACH         LINE#         50
   C:01C1H         LINE#         51
-  C:01E7H         LINE#         52
-  C:01F1H         LINE#         54
-  C:01F5H         LINE#         55
+  C:01C1H         LINE#         52
+  C:01E7H         LINE#         53
+  C:01F1H         LINE#         55
+  C:01F5H         LINE#         56
   -------         ENDPROC       _BINARYSERIES2USHORT
   -------         PROC          _SETLEDBIT
-  D:001FH         SYMBOL        led
+  D:0007H         SYMBOL        led
   B:0020H.0       SYMBOL        status
-  C:0006H         LINE#         57
-  C:0008H         LINE#         58
-  C:0008H         LINE#         59
+  C:03F1H         LINE#         58
+  C:03F1H         LINE#         59
+  C:03F1H         LINE#         64
+  C:03FCH         LINE#         66
+  C:0402H         LINE#         67
   -------         ENDPROC       _SETLEDBIT
   -------         ENDMOD        UTILITIES
 
@@ -536,13 +539,13 @@ SYMBOL TABLE OF MODULE:  .\Objects\main.omf (?C_STARTUP)
     SEGMENT: ?PR?TIMER1INIT?TIMER
 
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  20:10:30  PAGE 10
+
+
     SEGMENT: ?PR?DISPLAYDIGITDEMO?TRAFFIC_LIGHT
 
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  12/12/2022  17:34:32  PAGE 10
-
-
     SEGMENT: ?PR?_SETLEDBIT?UTILITIES
 
-Program Size: data=98.1 xdata=0 code=1036
+Program Size: data=109.1 xdata=0 code=1051
 LINK/LOCATE RUN COMPLETE.  3 WARNING(S),  0 ERROR(S)

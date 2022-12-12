@@ -34,7 +34,7 @@ typedef enum LED_status
 {
     LED_ON,
     LED_OFF
-}
+} LED_status;
 
 #define DECODE_MODE 0x09  // 译码控制寄存器
 #define INTENSITY 0x0A    // 亮度控制寄存器
