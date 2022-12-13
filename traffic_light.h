@@ -1,14 +1,6 @@
 #ifndef __TRAFFIC_LIGHT_H__
 #define __TRAFFIC_LIGHT_H__
 
-typedef enum direction
-{
-    EAST,
-    SOUTH,
-    WEST,
-    NORTH
-} direction;
-
 void TrafficLightInit();
 void TrafficLight();
 void Setting();
@@ -18,6 +10,8 @@ void DisplayDigit(uchar val, direction dir);
 void DisplayDigitDemo();
 void ClockReset();
 void ToggleSegs(direction dir);
-void DisplayLight(uchar light_status[]);
+void SetLedColor(direction dir, TrafficLightColor color);
+uchar GetReloadValue(direction dir, TrafficLightColor next_status);
+uchar GetDstLed(direction dir, TrafficLightColor color);
 
 #endif

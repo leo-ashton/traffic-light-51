@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   GLOBAL_VARS                                                       12/13/2022 09:45:49 PAGE 1   
+C51 COMPILER V9.60.0.0   GLOBAL_VARS                                                       12/13/2022 20:58:27 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE GLOBAL_VARS
@@ -14,6 +14,7 @@ line level    source
    4          ushort seconds = 0;      // 本周期经过的秒数
    5          ushort milliseconds = 0; // 毫秒数,为1000时令seconds++
    6          ushort cycle = 180;      // 红绿灯运行一轮的周期
+   7          bit new_second_flag = 0;
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
@@ -23,7 +24,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    PDATA SIZE       =   ----    ----
    DATA SIZE        =      7    ----
    IDATA SIZE       =   ----    ----
-   BIT SIZE         =   ----    ----
+   BIT SIZE         =      1    ----
 END OF MODULE INFORMATION.
 
 

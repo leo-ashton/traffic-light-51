@@ -27,15 +27,10 @@ void UpdateTimer0()
     TL0 = 0x20; // 设置定时初始值
     TH0 = 0xD1; // 设置定时初始值
     milliseconds++;
-    if (milliseconds > 1000)
+    if (milliseconds > 300)
     {
         seconds++;
-
-        remain_time[EAST]--;
-        remain_time[SOUTH]--;
-        remain_time[WEST]--;
-        remain_time[NORTH]--;
-
+        new_second_flag = 1;
         milliseconds = 0;
         if (seconds > cycle)
         {

@@ -32,9 +32,10 @@ void main()
 	DisplayDigit(50, WEST);
 	DisplayDigit(99, NORTH);
 
-	SetLedBit(NORTH_RED, LED_OFF);
-	SetLedBit(NORTH_YELLOW, LED_OFF);
-	SetLedBit(NORTH_GREEN, LED_ON);
+	SetLedColor(SOUTH, GREEN);
+	SetLedColor(NORTH, RED);
+	SetLedColor(WEST, RED);
+	SetLedColor(EAST, YELLOW);
 
 	DelayMS(500);
 	while (1)
@@ -49,7 +50,7 @@ void main()
 		}
 		if (mode == DEBUGGING)
 		{
-			TrafficLight();
+			// TrafficLight();
 		}
 	}
 }

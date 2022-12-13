@@ -3,19 +3,6 @@
 #define DONT_DISPLAY 255 // DisplayDigit函数的val为该值时，两位均不显示
 #define SEG_OFF 15       // Write7219向某位数码管写入该值时，该位数码管不显示
 
-typedef enum digs_addr
-{
-    EAST_TENS = 1,
-    EAST_ONES,
-    SOUTH_TENS,
-    SOUTH_ONES,
-    WEST_TENS,
-    WEST_ONES,
-    NORTH_TENS,
-    NORTH_ONES,
-} digs_addr;
-
-// static uchar last_east, last_south, last_west, last_north;
 static uchar last_display_val[4];
 digs_addr code ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
 digs_addr code TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
@@ -23,9 +10,16 @@ uchar remain_time[4];
 uchar red_time[4];
 uchar yellow_time[4];
 uchar green_time[4];
+uchar current_color[4];
 
 void TrafficLightInit()
 {
+    uchar i;
+    for (i = 0; i < TRAFFIC_LIGHT_MAX; i++)
+    {
+        SetLedBit(i, LED_OFF);
+    }
+    // 初始状态
     red_time[EAST] = 60, yellow_time[EAST] = 10, green_time[EAST] = 20;
     red_time[SOUTH] = 60, yellow_time[SOUTH] = 10, green_time[SOUTH] = 20;
     red_time[WEST] = 60, yellow_time[WEST] = 10, green_time[WEST] = 20;
@@ -35,6 +29,11 @@ void TrafficLightInit()
     remain_time[SOUTH] = red_time[SOUTH];
     remain_time[NORTH] = red_time[NORTH];
     remain_time[WEST] = red_time[WEST];
+
+    current_color[EAST] = GREEN;
+    current_color[SOUTH] = RED;
+    current_color[WEST] = RED;
+    current_color[NORTH] = RED;
 }
 
 void Write7219(unsigned char address, unsigned char dat)
@@ -97,6 +96,21 @@ void DisplayDigit(uchar val, direction dir)
         last_display_val[dir] = val;
 }
 
+uchar GetReloadValue(TrafficLightColor next_status, direction dir)
+{
+    switch (next_status)
+    {
+    case RED:
+        return red_time[dir];
+    case YELLOW:
+        return yellow_time[dir];
+    case GREEN:
+        return green_time[dir];
+    default:
+        break;
+    }
+}
+
 void DisplayDigitDemo()
 {
     Write7219(1, 1); // 15为全灭
@@ -112,10 +126,30 @@ void DisplayDigitDemo()
 
 void TrafficLight()
 {
-    DisplayDigit(remain_time[EAST], EAST);
-    DisplayDigit(remain_time[SOUTH], SOUTH);
-    DisplayDigit(remain_time[WEST], WEST);
-    DisplayDigit(remain_time[NORTH], NORTH);
+    uchar dir;
+    if (new_second_flag)
+    {
+        for (dir = 0; dir < DIRECTION_MAX; dir++)
+        {
+            remain_time[dir]--;       // 各方向倒计时更新
+            if (remain_time[dir] < 5) // 判断是否需要闪烁
+            {
+                ToggleLedBit(dir);
+            }
+            if (remain_time[dir] < 0)
+            {
+                // 装载下一个状态
+                remain_time[dir] = GetReloadValue(dir, current_color[dir]);
+            }
+
+            // 显示结果
+            DisplayDigit(remain_time[dir], dir);
+            // SetLedColor(dir, );
+        }
+        new_second_flag = 0; // 清除标志位
+    }
+    else
+        return;
 }
 
 void Setting()
@@ -156,4 +190,55 @@ void ToggleSegs(direction dir)
         DisplayDigit(last_display_val[dir], dir);
         ON[dir] = 1;
     }
+}
+
+void SetLedColor(direction dir, TrafficLightColor color)
+{
+    /**
+     * @brief 设置dir方向的灯色
+     * @ref 参见TrafficLight枚举
+     * @warning 在高频调用该函数时会使输出电平出现暂态，影响稳定性
+     */
+    SetLedBit(GetDstLed(dir, current_color[dir]), LED_OFF);
+    SetLedBit(GetDstLed(dir, color), LED_ON);
+    current_color[dir] = color;
+}
+
+uchar GetDstLed(direction dir, TrafficLightColor color)
+{
+    /**
+     * @brief 获取dir方向color颜色的LED对应的LEDs枚举变量
+     */
+    uchar dst_led = 0;
+    switch (dir)
+    {
+    case NORTH:
+        dst_led = 0;
+        break;
+    case WEST:
+        dst_led = 3;
+        break;
+    case SOUTH:
+        dst_led = 6;
+        break;
+    case EAST:
+        dst_led = 9;
+        break;
+    default:
+        break;
+    }
+    switch (color)
+    {
+    case GREEN:
+        break;
+    case YELLOW:
+        dst_led += 1;
+        break;
+    case RED:
+        dst_led += 2;
+        break;
+    default:
+        break;
+    }
+    return dst_led;
 }
