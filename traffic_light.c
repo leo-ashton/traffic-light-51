@@ -19,38 +19,55 @@ typedef enum digs
 static uchar last_display_val[4];
 const uchar ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
 const uchar TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
+uchar remain_time[4];
+uchar red_time[4];
+uchar yellow_time[4];
+uchar green_time[4];
+
+void TrafficLightInit()
+{
+    red_time[EAST] = 60, yellow_time[EAST] = 10, green_time[EAST] = 20;
+    red_time[SOUTH] = 60, yellow_time[SOUTH] = 10, green_time[SOUTH] = 20;
+    red_time[WEST] = 60, yellow_time[WEST] = 10, green_time[WEST] = 20;
+    red_time[NORTH] = 60, yellow_time[NORTH] = 10, green_time[NORTH] = 20;
+
+    remain_time[EAST] = green_time[EAST];
+    remain_time[SOUTH] = red_time[SOUTH];
+    remain_time[NORTH] = red_time[NORTH];
+    remain_time[WEST] = red_time[WEST];
+}
 
 void Write7219(unsigned char address, unsigned char dat)
 {
     unsigned char i;
-    LOAD_7219 = 0; //拉低片选线，选中器件
-    //发送地址
-    for (i = 0; i < 8; i++) //移位循环8次
+    LOAD_7219 = 0; // 拉低片选线，选中器件
+    // 发送地址
+    for (i = 0; i < 8; i++) // 移位循环8次
     {
-        CLK_7219 = 0;                     //清零时钟总线
-        DIN_7219 = (bit)(address & 0x80); //每次取高字节
-        address <<= 1;                    //左移一位
-        CLK_7219 = 1;                     //时钟上升沿，发送地址
+        CLK_7219 = 0;                     // 清零时钟总线
+        DIN_7219 = (bit)(address & 0x80); // 每次取高字节
+        address <<= 1;                    // 左移一位
+        CLK_7219 = 1;                     // 时钟上升沿，发送地址
     }
-    //发送数据
+    // 发送数据
     for (i = 0; i < 8; i++)
     {
         CLK_7219 = 0;
         DIN_7219 = (bit)(dat & 0x80);
         dat <<= 1;
-        CLK_7219 = 1; //时钟上升沿，发送数据
+        CLK_7219 = 1; // 时钟上升沿，发送数据
     }
-    LOAD_7219 = 1; //发送结束，上升沿锁存数据
+    LOAD_7219 = 1; // 发送结束，上升沿锁存数据
 }
 
 // MAX7219初始化，设置MAX7219内部的控制寄存器
 void Init7219(void)
 {
-    Write7219(SHUT_DOWN, 0x01);    //开启正常工作模式（0xX1）
-    Write7219(DISPLAY_TEST, 0x00); //选择工作模式（0xX0）
-    Write7219(DECODE_MODE, 0xff);  //选用全译码模式
+    Write7219(SHUT_DOWN, 0x01);    // 开启正常工作模式（0xX1）
+    Write7219(DISPLAY_TEST, 0x00); // 选择工作模式（0xX0）
+    Write7219(DECODE_MODE, 0xff);  // 选用全译码模式
     Write7219(SCAN_LIMIT, 0x07);   // 8只LED全用
-    Write7219(INTENSITY, 0x04);    //设置初始亮度
+    Write7219(INTENSITY, 0x04);    // 设置初始亮度
 }
 
 void DisplayDigit(uchar val, direction dir)
@@ -95,7 +112,10 @@ void DisplayDigitDemo()
 
 void TrafficLight()
 {
-
+    DisplayDigit(remain_time[EAST], EAST);
+    DisplayDigit(remain_time[SOUTH], SOUTH);
+    DisplayDigit(remain_time[WEST], WEST);
+    DisplayDigit(remain_time[NORTH], NORTH);
 }
 
 void Setting()
@@ -112,14 +132,14 @@ void Setting()
 void ClockReset()
 {
     // @brief 重置定时器0以及毫秒、秒计数器
-    TR0 = 0;    //定时器0开始计时
+    TR0 = 0;    // 定时器0开始计时
     ET0 = 0;    // 关闭定时器0中断
-    TL0 = 0x20; //设置定时初始值
-    TH0 = 0xD1; //设置定时初始值
+    TL0 = 0x20; // 设置定时初始值
+    TH0 = 0xD1; // 设置定时初始值
     milliseconds = 0;
     seconds = 0;
     ET0 = 1;
-    TR0 = 1; //定时器0开始计时
+    TR0 = 1; // 定时器0开始计时
 }
 
 void ToggleSegs(direction dir)

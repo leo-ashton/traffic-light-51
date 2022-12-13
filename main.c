@@ -28,10 +28,12 @@ void InterruptTimer0() interrupt 1
 void main()
 {
 	Timer0Init();
+	TrafficLightInit();
 	EA = 1;
 	ET0 = 1;
 	EX0 = 1; // 外部中断
 	Init7219();
+
 	DisplayDigit(1, EAST);
 	DisplayDigit(10, SOUTH);
 	DisplayDigit(50, WEST);
@@ -54,12 +56,7 @@ void main()
 		}
 		if (mode == DEBUGGING)
 		{
-			ToggleLedBit(SOUTH_YELLOW);
-			DelayMS(500);
-			// out_series[EAST_RED] = 1;
-			// foo = BinarySeries2ushort(out_series,
-			// 						  sizeof(out_series) / sizeof(out_series[0]));
-			// Hc595SendMultiByte((ushort)foo);
+			TrafficLight();
 		}
 	}
 }

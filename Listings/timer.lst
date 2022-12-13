@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   TIMER                                                             12/12/2022 20:33:23 PAGE 1   
+C51 COMPILER V9.60.0.0   TIMER                                                             12/13/2022 09:20:18 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TIMER
@@ -13,47 +13,57 @@ line level    source
    3          void Timer0Init(void) // 1毫秒@12.000MHz
    4          {
    5   1          // AUXR |= 0x80; //定时器时钟1T模式
-   6   1          TMOD &= 0xF0; //设置定时器模式
-   7   1          TL0 = 0x20;   //设置定时初始值
-   8   1          TH0 = 0xD1;   //设置定时初始值
-   9   1          TF0 = 0;      //清除TF0标志
-  10   1          TR0 = 1;      //定时器0开始计时
+   6   1          TMOD &= 0xF0; // 设置定时器模式
+   7   1          TL0 = 0x20;   // 设置定时初始值
+   8   1          TH0 = 0xD1;   // 设置定时初始值
+   9   1          TF0 = 0;      // 清除TF0标志
+  10   1          TR0 = 1;      // 定时器0开始计时
   11   1      }
   12          
   13          void Timer1Init(void) // 5毫秒@12.000MHz
   14          {
-  15   1          TMOD |= 0x0F; //设置定时器模式
-  16   1          TL1 = 0xA0;   //设置定时初始值
-  17   1          TH1 = 0x15;   //设置定时初始值
-  18   1          TF1 = 0;      //清除TF1标志
-  19   1          TR1 = 1;      //定时器1开始计时
+  15   1          TMOD |= 0x0F; // 设置定时器模式
+  16   1          TL1 = 0xA0;   // 设置定时初始值
+  17   1          TH1 = 0x15;   // 设置定时初始值
+  18   1          TF1 = 0;      // 清除TF1标志
+  19   1          TR1 = 1;      // 定时器1开始计时
   20   1      }
   21          
   22          void UpdateTimer0()
   23          {
-  24   1          // 定时器中断服务程序
-  25   1          // 重置初值
-  26   1          TL0 = 0x20; //设置定时初始值
-  27   1          TH0 = 0xD1; //设置定时初始值
-  28   1          milliseconds++;
-  29   1          if (milliseconds > 1000)
-  30   1          {
-  31   2              seconds++;
-  32   2              milliseconds = 0;
-  33   2              if (seconds > cycle)
-  34   2              {
-  35   3                  seconds = 0;
-  36   3              }
-  37   2          }
-  38   1      }
+  24   1          EA = 0;
+  25   1          // 定时器中断服务程序
+  26   1          // 重置初值
+  27   1          TL0 = 0x20; // 设置定时初始值
+  28   1          TH0 = 0xD1; // 设置定时初始值
+  29   1          milliseconds++;
+  30   1          if (milliseconds > 1000)
+  31   1          {
+  32   2              seconds++;
+  33   2      
+  34   2              remain_time[EAST]--;
+  35   2              remain_time[SOUTH]--;
+  36   2              remain_time[WEST]--;
+  37   2              remain_time[NORTH]--;
+  38   2      
+  39   2              milliseconds = 0;
+  40   2              if (seconds > cycle)
+  41   2              {
+  42   3                  seconds = 0;
+  43   3              }
+  44   2          }
+  45   1          EA = 1;
+  46   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     81    ----
+   CODE SIZE        =     93    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
+C51 COMPILER V9.60.0.0   TIMER                                                             12/13/2022 09:20:18 PAGE 2   
+
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

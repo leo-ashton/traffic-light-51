@@ -45,8 +45,8 @@ unsigned short BinarySeries2ushort(uchar series[], uchar len)
      * @return 转换的十进制数
      */
     // TODO implement this
-    static ushort i, ret;
-
+    static ushort ret;
+    static uchar i;
     for (i = 0, ret = 0; i < len; i++)
     {
         ret += (series[i] << i);
