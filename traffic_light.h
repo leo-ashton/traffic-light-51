@@ -16,6 +16,7 @@ typedef struct seg
     uchar tens;
 } seg;
 
+void TrafficLightInit();
 void TrafficLight();
 void Setting();
 void Init7219(void);
