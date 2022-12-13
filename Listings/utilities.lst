@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   UTILITIES                                                         12/13/2022 09:23:08 PAGE 1   
+C51 COMPILER V9.60.0.0   UTILITIES                                                         12/13/2022 09:45:49 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE UTILITIES
@@ -10,85 +10,84 @@ line level    source
 
    1          #include "headfile.h"
    2          
-   3          static uchar last_led_status[HC595_CNT * 8];
-   4          static uchar led_status[TRAFFIC_LIGHT_MAX];
-   5          
-   6          void DelayMS(uint x)
-   7          {
-   8   1          uchar i;
-   9   1          while (x--)
-  10   1              for (i = 0; i < 120; i++)
-  11   1                  ;
-  12   1      }
-  13          
-  14          void Hc595SendMultiByte(unsigned short dat)
-  15          {
-  16   1          /**
-  17   1           * @brief 向HC595发送数据，并并行输出；dat的高8位在第二块HC595（东边的三个灯
+   3          static uchar led_status[TRAFFIC_LIGHT_MAX];
+   4          
+   5          void DelayMS(uint x)
+   6          {
+   7   1          uchar i;
+   8   1          while (x--)
+   9   1              for (i = 0; i < 120; i++)
+  10   1                  ;
+  11   1      }
+  12          
+  13          void Hc595SendMultiByte(unsigned short dat)
+  14          {
+  15   1          /**
+  16   1           * @brief 向HC595发送数据，并并行输出；dat的高8位在第二块HC595（东边的三个灯
              -所在的那片），低8位在第一块HC595
-  18   1           */
-  19   1          uchar a;
-  20   1      
-  21   1          SRCLK = 1;
-  22   1          RCLK = 1;
-  23   1      
-  24   1          for (a = 0; a < sizeof(dat) * 8; a++) // 发送8位数
-  25   1          {
-  26   2              SER = dat >> ((sizeof(dat) * 8) - 1); // 从最高位开始发送
-  27   2              dat <<= 1;
-  28   2      
-  29   2              SRCLK = 0; // 发送时序
+  17   1           */
+  18   1          uchar a;
+  19   1      
+  20   1          SRCLK = 1;
+  21   1          RCLK = 1;
+  22   1      
+  23   1          for (a = 0; a < sizeof(dat) * 8; a++) // 发送8位数
+  24   1          {
+  25   2              SER = dat >> ((sizeof(dat) * 8) - 1); // 从最高位开始发送
+  26   2              dat <<= 1;
+  27   2      
+  28   2              SRCLK = 0; // 发送时序
+  29   2              _nop_();
   30   2              _nop_();
-  31   2              _nop_();
-  32   2              SRCLK = 1;
-  33   2          }
-  34   1          RCLK = 0;
+  31   2              SRCLK = 1;
+  32   2          }
+  33   1          RCLK = 0;
+  34   1          _nop_();
   35   1          _nop_();
-  36   1          _nop_();
-  37   1          RCLK = 1;
-  38   1      }
-  39          
-  40          unsigned short BinarySeries2ushort(uchar series[], uchar len)
-  41          {
-  42   1          /**
-  43   1           * @brief 将二进制序列数组转换为对应的十进制数
-  44   1           * @param series 高位在前的二进制序列
-  45   1           * @return 转换的十进制数
-  46   1           */
-  47   1          // TODO implement this
-  48   1          static ushort ret;
-  49   1          static uchar i;
-  50   1          for (i = 0, ret = 0; i < len; i++)
-  51   1          {
-  52   2              ret += (series[i] << i);
-  53   2          }
-C51 COMPILER V9.60.0.0   UTILITIES                                                         12/13/2022 09:23:08 PAGE 2   
+  36   1          RCLK = 1;
+  37   1      }
+  38          
+  39          unsigned short BinarySeries2ushort(uchar series[], uchar len)
+  40          {
+  41   1          /**
+  42   1           * @brief 将二进制序列数组转换为对应的十进制数
+  43   1           * @param series 高位在前的二进制序列
+  44   1           * @return 转换的十进制数
+  45   1           */
+  46   1          // TODO implement this
+  47   1          static ushort ret;
+  48   1          static uchar i;
+  49   1          for (i = 0, ret = 0; i < len; i++)
+  50   1          {
+  51   2              ret += (series[i] << i);
+  52   2          }
+  53   1      
+C51 COMPILER V9.60.0.0   UTILITIES                                                         12/13/2022 09:45:49 PAGE 2   
 
-  54   1      
-  55   1          return ret;
-  56   1      }
-  57          
-  58          void SetLedBit(LEDs led, bit status)
-  59          {
-  60   1          /**
-  61   1           * @brief 设置某位LED的状态。这是唯一允许的操作LED的方式。
-  62   1           * @param led 枚举类型变量，操作的LED位
-  63   1           */
-  64   1          led_status[led] = status;
-  65   1          Hc595SendMultiByte(
-  66   1              BinarySeries2ushort(led_status,
-  67   1                                  sizeof(led_status) / sizeof(led_status[0])));
-  68   1          // last_led_status[led] = status;
-  69   1      }
-  70          
-  71          void ToggleLedBit(LEDs led)
-  72          {
-  73   1          led_status[led] = !led_status[led];
-  74   1          Hc595SendMultiByte(
-  75   1              BinarySeries2ushort(led_status,
-  76   1                                  sizeof(led_status) / sizeof(led_status[0])));
-  77   1          // last_led_status[led] = led_status[led];
-  78   1      }
+  54   1          return ret;
+  55   1      }
+  56          
+  57          void SetLedBit(LEDs led, bit status)
+  58          {
+  59   1          /**
+  60   1           * @brief 设置某位LED的状态。这是唯一允许的操作LED的方式。
+  61   1           * @param led 枚举类型变量，操作的LED位
+  62   1           */
+  63   1          led_status[led] = status;
+  64   1          Hc595SendMultiByte(
+  65   1              BinarySeries2ushort(led_status,
+  66   1                                  sizeof(led_status) / sizeof(led_status[0])));
+  67   1          // last_led_status[led] = status;
+  68   1      }
+  69          
+  70          void ToggleLedBit(LEDs led)
+  71          {
+  72   1          led_status[led] = !led_status[led];
+  73   1          Hc595SendMultiByte(
+  74   1              BinarySeries2ushort(led_status,
+  75   1                                  sizeof(led_status) / sizeof(led_status[0])));
+  76   1          // last_led_status[led] = led_status[led];
+  77   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
@@ -96,7 +95,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     31       3
+   DATA SIZE        =     15       3
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----       1
 END OF MODULE INFORMATION.

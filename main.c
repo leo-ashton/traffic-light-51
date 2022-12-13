@@ -1,11 +1,4 @@
 #include "headfile.h"
-uchar digit_codes[] = {0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xf8,
-					   0x80, 0x90, 0x88, 0x83, 0xc6, 0xa1, 0x86, 0x8e}; // 数码管段码
-uchar Flash_Count = 0, Operation_Type = 1;								// 闪烁次数，操作类型变量
-uchar out_series[HC595_CNT * 8] = {0};
-uint i = 0;
-uint pre_second = 0;
-ushort foo = 0;
 
 void InterruptKey() interrupt 0
 {

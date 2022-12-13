@@ -1,6 +1,5 @@
 #include "headfile.h"
 
-static uchar last_led_status[HC595_CNT * 8];
 static uchar led_status[TRAFFIC_LIGHT_MAX];
 
 void DelayMS(uint x)

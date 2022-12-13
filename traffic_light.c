@@ -3,7 +3,7 @@
 #define DONT_DISPLAY 255 // DisplayDigit函数的val为该值时，两位均不显示
 #define SEG_OFF 15       // Write7219向某位数码管写入该值时，该位数码管不显示
 
-typedef enum digs
+typedef enum digs_addr
 {
     EAST_TENS = 1,
     EAST_ONES,
@@ -13,12 +13,12 @@ typedef enum digs
     WEST_ONES,
     NORTH_TENS,
     NORTH_ONES,
-} digs;
+} digs_addr;
 
 // static uchar last_east, last_south, last_west, last_north;
 static uchar last_display_val[4];
-const uchar ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
-const uchar TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
+digs_addr code ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
+digs_addr code TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
 uchar remain_time[4];
 uchar red_time[4];
 uchar yellow_time[4];
