@@ -3,14 +3,12 @@
 #define DONT_DISPLAY 255 // DisplayDigit函数的val为该值时，两位均不显示
 #define SEG_OFF 15       // Write7219向某位数码管写入该值时，该位数码管不显示
 
-static uchar last_display_val[4];
+static uchar last_display_val[DIRECTION_MAX];
 digs_addr code ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
 digs_addr code TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
-uchar remain_time[4];
-uchar red_time[4];
-uchar yellow_time[4];
-uchar green_time[4];
-uchar current_color[4];
+uchar remain_time[DIRECTION_MAX];
+uchar light_time[DIRECTION_MAX][3]; // 存放四个方向的三色灯的设置时间
+uchar current_color[DIRECTION_MAX];
 TrafficLightColor next_status;
 
 void TrafficLightInit()
@@ -25,10 +23,10 @@ void TrafficLightInit()
         SetLedBit(i, LED_OFF); // 关掉所有灯
     }
     // 初始状态
-    red_time[EAST] = 60, yellow_time[EAST] = 5, green_time[EAST] = 15;
-    red_time[SOUTH] = 60, yellow_time[SOUTH] = 5, green_time[SOUTH] = 15;
-    red_time[WEST] = 60, yellow_time[WEST] = 5, green_time[WEST] = 15;
-    red_time[NORTH] = 60, yellow_time[NORTH] = 5, green_time[NORTH] = 15;
+    light_time[EAST][RED] = 60, light_time[EAST][YELLOW] = 5, light_time[EAST][GREEN] = 15;
+    light_time[SOUTH][RED] = 60, light_time[SOUTH][YELLOW] = 5, light_time[SOUTH][GREEN] = 15;
+    light_time[WEST][RED] = 60, light_time[WEST][YELLOW] = 5, light_time[WEST][GREEN] = 15;
+    light_time[NORTH][RED] = 60, light_time[NORTH][YELLOW] = 5, light_time[NORTH][GREEN] = 15;
 
     remain_time[EAST] = 15;
     remain_time[SOUTH] = 20;
@@ -101,22 +99,6 @@ void DisplayDigit(uchar val, direction dir)
         last_display_val[dir] = val;
 }
 
-uchar GetReloadValue(TrafficLightColor next_status, direction dir)
-{
-    switch (next_status)
-    {
-    case RED:
-        return red_time[dir];
-    case YELLOW:
-        return yellow_time[dir];
-    case GREEN:
-        return green_time[dir];
-    default:
-        break;
-    }
-    return 0;
-}
-
 void DisplayDigitDemo()
 {
     Write7219(1, 1); // 15为全灭
@@ -147,7 +129,8 @@ void TrafficLight()
             {
                 // 装载下一个状态
                 next_status = (current_color[dir] + 1 >= TRAFFIC_LIGHT_STATUS_MAX) ? (RED) : (current_color[dir] + 1);
-                remain_time[dir] = GetReloadValue(next_status, dir);
+                // remain_time[dir] = GetReloadValue(next_status, dir);
+                remain_time[dir] = light_time[dir][next_status];
                 SetLedColor(dir, next_status);
             }
 
