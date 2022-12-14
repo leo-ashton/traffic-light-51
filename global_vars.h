@@ -8,5 +8,6 @@ extern ushort cycle;        // 红绿灯运行一轮的周期
 extern uchar remain_time[4];
 extern bit new_second_flag;
 extern bit new_second_flag_setting;
+extern bit new_second_flag_emergency;
 
 #endif

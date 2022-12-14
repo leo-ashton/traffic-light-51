@@ -10,8 +10,8 @@ typedef enum func
     DEBUGGING,
     RUNNING,
     SETTING,
-    EMERGENCY,
-    FUNC_MAX
+    FUNC_MAX,
+    EMERGENCY
 } func;
 
 typedef enum TrafficLight

@@ -6,6 +6,10 @@
 static uchar last_display_val[DIRECTION_MAX];
 digs_addr code ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
 digs_addr code TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
+LEDs code LED_MAP[DIRECTION_MAX][3] = {{EAST_RED, EAST_GREEN, EAST_YELLOW},
+                                       {SOUTH_RED, SOUTH_GREEN, SOUTH_YELLOW},
+                                       {WEST_RED, WEST_GREEN, WEST_YELLOW},
+                                       {NORTH_RED, NORTH_GREEN, NORTH_YELLOW}};
 uchar remain_time[DIRECTION_MAX];
 uchar light_time[DIRECTION_MAX][3]; // 存放四个方向的三色灯的设置时间,第一维度为dir,第二维度为color
 uchar current_color[DIRECTION_MAX];
@@ -99,19 +103,6 @@ void DisplayDigit(uchar val, direction dir)
         last_display_val[dir] = val;
 }
 
-void DisplayDigitDemo()
-{
-    Write7219(1, 1); // 15为全灭
-    Write7219(2, 2);
-    Write7219(3, 3);
-    Write7219(4, 4);
-    Write7219(5, 5);
-    Write7219(6, 6);
-    Write7219(7, 7);
-    Write7219(8, 8);
-    // Write7219(1, 15); // 15为全灭
-}
-
 void TrafficLightMain()
 {
     direction dir;
@@ -123,7 +114,8 @@ void TrafficLightMain()
             if (remain_time[dir] < 5) // 判断是否需要闪烁
             {
                 if (current_color[dir] == YELLOW)
-                    ToggleLedBit(GetDstLed(dir, YELLOW));
+                    ToggleLedBit(LED_MAP[dir][YELLOW]);
+                // ToggleLedBit(GetDstLed(dir, YELLOW));
             }
             if (remain_time[dir] <= 0)
             {
@@ -193,7 +185,6 @@ void SettingMain()
     }
     ClockReset();       // 重置时钟
     TrafficLightInit(); // 重新初始化
-    mode = RUNNING;
     // EA = 1;
 }
 
@@ -233,52 +224,32 @@ void SetLedColor(direction dir, TrafficLightColor color)
      * @ref 参见TrafficLight枚举
      * @warning 在高频调用该函数时会使输出电平出现暂态，影响稳定性
      */
-    SetLedBit(GetDstLed(dir, current_color[dir]), LED_OFF);
-    SetLedBit(GetDstLed(dir, color), LED_ON);
+    SetLedBit(LED_MAP[dir][current_color[dir]], LED_OFF);
+    SetLedBit(LED_MAP[dir][color], LED_ON);
+    // SetLedBit(GetDstLed(dir, current_color[dir]), LED_OFF);
+    // SetLedBit(GetDstLed(dir, color), LED_ON);
     current_color[dir] = color;
-}
-
-uchar GetDstLed(direction dir, TrafficLightColor color)
-{
-    /**
-     * @brief 获取dir方向color颜色的LED对应的LEDs枚举变量
-     */
-    uchar dst_led = 0;
-    switch (dir)
-    {
-    case NORTH:
-        dst_led = 0;
-        break;
-    case WEST:
-        dst_led = 3;
-        break;
-    case SOUTH:
-        dst_led = 6;
-        break;
-    case EAST:
-        dst_led = 9;
-        break;
-    default:
-        break;
-    }
-    switch (color)
-    {
-    case GREEN:
-        break;
-    case YELLOW:
-        dst_led += 1;
-        break;
-    case RED:
-        dst_led += 2;
-        break;
-    default:
-        break;
-    }
-    return dst_led;
 }
 
 void EmergencyMain()
 {
+    direction dir;
+    new_second_flag_emergency = 0;
+    for (dir = EAST; dir < DIRECTION_MAX; dir++)
+        SetLedColor(dir, YELLOW);
+    while (mode == EMERGENCY)
+    {
+        if (new_second_flag_emergency)
+        {
+            for (dir = EAST; dir < DIRECTION_MAX; dir++)
+            {
+                DisplayDigit(DONT_DISPLAY, dir);
+                ToggleLedBit(LED_MAP[dir][YELLOW]);
+            }
+            new_second_flag_emergency = 0;
+        }
+    }
+    TrafficLightInit(); // 恢复正常运行模式
 }
 
 void LoadDefaultTime()

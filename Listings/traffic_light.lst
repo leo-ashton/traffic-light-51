@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 21:01:35 PAGE 1   
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 22:25:42 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TRAFFIC_LIGHT
@@ -16,310 +16,279 @@ line level    source
    6          static uchar last_display_val[DIRECTION_MAX];
    7          digs_addr code ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
    8          digs_addr code TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
-   9          uchar remain_time[DIRECTION_MAX];
-  10          uchar light_time[DIRECTION_MAX][3]; // 存放四个方向的三色灯的设置时间,第一维度为dir,�
+   9          LEDs code LED_MAP[DIRECTION_MAX][3] = {{EAST_RED, EAST_GREEN, EAST_YELLOW},
+  10                                                 {SOUTH_RED, SOUTH_GREEN, SOUTH_YELLOW},
+  11                                                 {WEST_RED, WEST_GREEN, WEST_YELLOW},
+  12                                                 {NORTH_RED, NORTH_GREEN, NORTH_YELLOW}};
+  13          uchar remain_time[DIRECTION_MAX];
+  14          uchar light_time[DIRECTION_MAX][3]; // 存放四个方向的三色灯的设置时间,第一维度为dir,�
              -�二维度为color
-  11          uchar current_color[DIRECTION_MAX];
-  12          TrafficLightColor next_status;
-  13          
-  14          void TrafficLightInit()
-  15          {
-  16   1          /**
-  17   1           * @brief 初始化交通灯的值
-  18   1           * @todo 注意修改初始时间
-  19   1           */
-  20   1          uchar i;
-  21   1          for (i = 0; i < TRAFFIC_LIGHT_MAX; i++)
-  22   1          {
-  23   2              SetLedBit(i, LED_OFF); // 关掉所有灯
-  24   2          }
-  25   1      
-  26   1          remain_time[EAST] = light_time[EAST][GREEN];
-  27   1          remain_time[SOUTH] = remain_time[EAST] + light_time[EAST][YELLOW];
-  28   1          remain_time[WEST] = remain_time[SOUTH] + light_time[SOUTH][GREEN] + light_time[SOUTH][YELLOW];
-  29   1          remain_time[NORTH] = remain_time[WEST] + light_time[WEST][GREEN] + light_time[WEST][YELLOW];
-  30   1      
-  31   1          // remain_time[EAST] = 15;
-  32   1          // remain_time[SOUTH] = 20;
-  33   1          // remain_time[WEST] = 40;
-  34   1          // remain_time[NORTH] = 60;
-  35   1      
-  36   1          SetLedColor(EAST, GREEN);
-  37   1          SetLedColor(SOUTH, RED);
-  38   1          SetLedColor(WEST, RED);
-  39   1          SetLedColor(NORTH, RED);
-  40   1      }
-  41          
-  42          void Write7219(unsigned char address, unsigned char dat)
-  43          {
-  44   1          unsigned char i;
-  45   1          LOAD_7219 = 0; // 拉低片选线，选中器件
-  46   1          // 发送地址
-  47   1          for (i = 0; i < 8; i++) // 移位循环8次
-  48   1          {
-  49   2              CLK_7219 = 0;                     // 清零时钟总线
-  50   2              DIN_7219 = (bit)(address & 0x80); // 每次取高字节
-  51   2              address <<= 1;                    // 左移一位
-  52   2              CLK_7219 = 1;                     // 时钟上升沿，发送地址
-  53   2          }
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 21:01:35 PAGE 2   
+  15          uchar current_color[DIRECTION_MAX];
+  16          TrafficLightColor next_status;
+  17          
+  18          void TrafficLightInit()
+  19          {
+  20   1          /**
+  21   1           * @brief 初始化交通灯的值
+  22   1           * @todo 注意修改初始时间
+  23   1           */
+  24   1          uchar i;
+  25   1          for (i = 0; i < TRAFFIC_LIGHT_MAX; i++)
+  26   1          {
+  27   2              SetLedBit(i, LED_OFF); // 关掉所有灯
+  28   2          }
+  29   1      
+  30   1          remain_time[EAST] = light_time[EAST][GREEN];
+  31   1          remain_time[SOUTH] = remain_time[EAST] + light_time[EAST][YELLOW];
+  32   1          remain_time[WEST] = remain_time[SOUTH] + light_time[SOUTH][GREEN] + light_time[SOUTH][YELLOW];
+  33   1          remain_time[NORTH] = remain_time[WEST] + light_time[WEST][GREEN] + light_time[WEST][YELLOW];
+  34   1      
+  35   1          // remain_time[EAST] = 15;
+  36   1          // remain_time[SOUTH] = 20;
+  37   1          // remain_time[WEST] = 40;
+  38   1          // remain_time[NORTH] = 60;
+  39   1      
+  40   1          SetLedColor(EAST, GREEN);
+  41   1          SetLedColor(SOUTH, RED);
+  42   1          SetLedColor(WEST, RED);
+  43   1          SetLedColor(NORTH, RED);
+  44   1      }
+  45          
+  46          void Write7219(unsigned char address, unsigned char dat)
+  47          {
+  48   1          unsigned char i;
+  49   1          LOAD_7219 = 0; // 拉低片选线，选中器件
+  50   1          // 发送地址
+  51   1          for (i = 0; i < 8; i++) // 移位循环8次
+  52   1          {
+  53   2              CLK_7219 = 0;                     // 清零时钟总线
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 22:25:42 PAGE 2   
 
-  54   1          // 发送数据
-  55   1          for (i = 0; i < 8; i++)
-  56   1          {
-  57   2              CLK_7219 = 0;
-  58   2              DIN_7219 = (bit)(dat & 0x80);
-  59   2              dat <<= 1;
-  60   2              CLK_7219 = 1; // 时钟上升沿，发送数据
-  61   2          }
-  62   1          LOAD_7219 = 1; // 发送结束，上升沿锁存数据
-  63   1      }
-  64          
-  65          // MAX7219初始化，设置MAX7219内部的控制寄存器
-  66          void Init7219(void)
-  67          {
-  68   1          Write7219(SHUT_DOWN, 0x01);    // 开启正常工作模式（0xX1）
-  69   1          Write7219(DISPLAY_TEST, 0x00); // 选择工作模式（0xX0）
-  70   1          Write7219(DECODE_MODE, 0xff);  // 选用全译码模式
-  71   1          Write7219(SCAN_LIMIT, 0x07);   // 8只LED全用
-  72   1          Write7219(INTENSITY, 0x04);    // 设置初始亮度
-  73   1      }
-  74          
-  75          void DisplayDigit(uchar val, direction dir)
-  76          {
-  77   1          // @brief 在dir方向展示val,并将本次显示的值保存在last_变量中
-  78   1          // @note  这是唯一允许调用数码管显示的方式
-  79   1          static uchar ones, tens;
-  80   1      
-  81   1          if (val == DONT_DISPLAY)
-  82   1          {
-  83   2              // 两位均不显示
-  84   2              ones = SEG_OFF;
-  85   2              tens = SEG_OFF;
-  86   2          }
-  87   1          else
-  88   1          {
-  89   2              ones = val % 10;
-  90   2              tens = (val / 10 % 10) == 0 ? SEG_OFF : (val / 10 % 10); // 如果十位为0，则不显示
-  91   2          }
-  92   1      
-  93   1          Write7219(ONES_BIT[dir], ones);
-  94   1          Write7219(TENS_BIT[dir], tens);
-  95   1      
-  96   1          if (val == DONT_DISPLAY)
-  97   1              last_display_val[dir] = last_display_val[dir]; // 不保存空白位置
-  98   1          else
-  99   1              last_display_val[dir] = val;
- 100   1      }
- 101          
- 102          void DisplayDigitDemo()
- 103          {
- 104   1          Write7219(1, 1); // 15为全灭
- 105   1          Write7219(2, 2);
- 106   1          Write7219(3, 3);
- 107   1          Write7219(4, 4);
- 108   1          Write7219(5, 5);
- 109   1          Write7219(6, 6);
- 110   1          Write7219(7, 7);
- 111   1          Write7219(8, 8);
- 112   1          // Write7219(1, 15); // 15为全灭
- 113   1      }
- 114          
- 115          void TrafficLightMain()
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 21:01:35 PAGE 3   
+  54   2              DIN_7219 = (bit)(address & 0x80); // 每次取高字节
+  55   2              address <<= 1;                    // 左移一位
+  56   2              CLK_7219 = 1;                     // 时钟上升沿，发送地址
+  57   2          }
+  58   1          // 发送数据
+  59   1          for (i = 0; i < 8; i++)
+  60   1          {
+  61   2              CLK_7219 = 0;
+  62   2              DIN_7219 = (bit)(dat & 0x80);
+  63   2              dat <<= 1;
+  64   2              CLK_7219 = 1; // 时钟上升沿，发送数据
+  65   2          }
+  66   1          LOAD_7219 = 1; // 发送结束，上升沿锁存数据
+  67   1      }
+  68          
+  69          // MAX7219初始化，设置MAX7219内部的控制寄存器
+  70          void Init7219(void)
+  71          {
+  72   1          Write7219(SHUT_DOWN, 0x01);    // 开启正常工作模式（0xX1）
+  73   1          Write7219(DISPLAY_TEST, 0x00); // 选择工作模式（0xX0）
+  74   1          Write7219(DECODE_MODE, 0xff);  // 选用全译码模式
+  75   1          Write7219(SCAN_LIMIT, 0x07);   // 8只LED全用
+  76   1          Write7219(INTENSITY, 0x04);    // 设置初始亮度
+  77   1      }
+  78          
+  79          void DisplayDigit(uchar val, direction dir)
+  80          {
+  81   1          // @brief 在dir方向展示val,并将本次显示的值保存在last_变量中
+  82   1          // @note  这是唯一允许调用数码管显示的方式
+  83   1          static uchar ones, tens;
+  84   1      
+  85   1          if (val == DONT_DISPLAY)
+  86   1          {
+  87   2              // 两位均不显示
+  88   2              ones = SEG_OFF;
+  89   2              tens = SEG_OFF;
+  90   2          }
+  91   1          else
+  92   1          {
+  93   2              ones = val % 10;
+  94   2              tens = (val / 10 % 10) == 0 ? SEG_OFF : (val / 10 % 10); // 如果十位为0，则不显示
+  95   2          }
+  96   1      
+  97   1          Write7219(ONES_BIT[dir], ones);
+  98   1          Write7219(TENS_BIT[dir], tens);
+  99   1      
+ 100   1          if (val == DONT_DISPLAY)
+ 101   1              last_display_val[dir] = last_display_val[dir]; // 不保存空白位置
+ 102   1          else
+ 103   1              last_display_val[dir] = val;
+ 104   1      }
+ 105          
+ 106          void TrafficLightMain()
+ 107          {
+ 108   1          direction dir;
+ 109   1          if (new_second_flag)
+ 110   1          {
+ 111   2              for (dir = 0; dir < DIRECTION_MAX; dir++)
+ 112   2              {
+ 113   3                  remain_time[dir]--;       // 各方向倒计时更新
+ 114   3                  if (remain_time[dir] < 5) // 判断是否需要闪烁
+ 115   3                  {
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 22:25:42 PAGE 3   
 
- 116          {
- 117   1          direction dir;
- 118   1          if (new_second_flag)
- 119   1          {
- 120   2              for (dir = 0; dir < DIRECTION_MAX; dir++)
- 121   2              {
- 122   3                  remain_time[dir]--;       // 各方向倒计时更新
- 123   3                  if (remain_time[dir] < 5) // 判断是否需要闪烁
- 124   3                  {
- 125   4                      if (current_color[dir] == YELLOW)
- 126   4                          ToggleLedBit(GetDstLed(dir, YELLOW));
- 127   4                  }
- 128   3                  if (remain_time[dir] <= 0)
- 129   3                  {
- 130   4                      // 装载下一个状态
- 131   4                      next_status = (current_color[dir] + 1 >= TRAFFIC_LIGHT_STATUS_MAX) ? (RED) : (current_colo
+ 116   4                      if (current_color[dir] == YELLOW)
+ 117   4                          ToggleLedBit(LED_MAP[dir][YELLOW]);
+ 118   4                      // ToggleLedBit(GetDstLed(dir, YELLOW));
+ 119   4                  }
+ 120   3                  if (remain_time[dir] <= 0)
+ 121   3                  {
+ 122   4                      // 装载下一个状态
+ 123   4                      next_status = (current_color[dir] + 1 >= TRAFFIC_LIGHT_STATUS_MAX) ? (RED) : (current_colo
              -r[dir] + 1);
- 132   4                      // remain_time[dir] = GetReloadValue(next_status, dir);
- 133   4                      remain_time[dir] = light_time[dir][next_status];
- 134   4                      SetLedColor(dir, next_status);
- 135   4                  }
- 136   3      
- 137   3                  // 数码管显示剩余秒数
- 138   3                  DisplayDigit(remain_time[dir], dir);
- 139   3              }
- 140   2              new_second_flag = 0; // 清除标志位
- 141   2          }
- 142   1          else
- 143   1              return;
- 144   1      }
- 145          
- 146          void SettingMain()
- 147          {
- 148   1          direction dir = EAST;
- 149   1          uchar time_out_flag = 0;
- 150   1          TrafficLightColor color = RED;
- 151   1      
- 152   1          for (dir = EAST; dir < DIRECTION_MAX; dir++)
- 153   1          {
- 154   2              SetLedColor(dir, RED); // 全部置为红灯
- 155   2          }
- 156   1      
- 157   1          while (mode == SETTING)
- 158   1          {
- 159   2              for (dir = EAST; dir < DIRECTION_MAX && mode == SETTING; dir++)
- 160   2              {
- 161   3                  for (color = RED; color < TRAFFIC_LIGHT_STATUS_MAX && mode == SETTING; color++)
- 162   3                  {
- 163   4                      while (mode == SETTING)
- 164   4                      {
- 165   5                          if (SWITCH_KEY == 0)
- 166   5                          {
- 167   6                              DelayMS(100);
- 168   6                              if (SWITCH_KEY == 0)
- 169   6                                  break;
- 170   6                          }
- 171   5                          if (new_second_flag_setting)
- 172   5                          {
- 173   6                              DisplayDigit(light_time[dir][color], dir);
- 174   6                              ToggleSegs(dir);
- 175   6                              new_second_flag_setting = 0;
- 176   6                          }
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 21:01:35 PAGE 4   
+ 124   4                      // remain_time[dir] = GetReloadValue(next_status, dir);
+ 125   4                      remain_time[dir] = light_time[dir][next_status];
+ 126   4                      SetLedColor(dir, next_status);
+ 127   4                  }
+ 128   3      
+ 129   3                  // 数码管显示剩余秒数
+ 130   3                  DisplayDigit(remain_time[dir], dir);
+ 131   3              }
+ 132   2              new_second_flag = 0; // 清除标志位
+ 133   2          }
+ 134   1          else
+ 135   1              return;
+ 136   1      }
+ 137          
+ 138          void SettingMain()
+ 139          {
+ 140   1          direction dir = EAST;
+ 141   1          uchar time_out_flag = 0;
+ 142   1          TrafficLightColor color = RED;
+ 143   1      
+ 144   1          for (dir = EAST; dir < DIRECTION_MAX; dir++)
+ 145   1          {
+ 146   2              SetLedColor(dir, RED); // 全部置为红灯
+ 147   2          }
+ 148   1      
+ 149   1          while (mode == SETTING)
+ 150   1          {
+ 151   2              for (dir = EAST; dir < DIRECTION_MAX && mode == SETTING; dir++)
+ 152   2              {
+ 153   3                  for (color = RED; color < TRAFFIC_LIGHT_STATUS_MAX && mode == SETTING; color++)
+ 154   3                  {
+ 155   4                      while (mode == SETTING)
+ 156   4                      {
+ 157   5                          if (SWITCH_KEY == 0)
+ 158   5                          {
+ 159   6                              DelayMS(100);
+ 160   6                              if (SWITCH_KEY == 0)
+ 161   6                                  break;
+ 162   6                          }
+ 163   5                          if (new_second_flag_setting)
+ 164   5                          {
+ 165   6                              DisplayDigit(light_time[dir][color], dir);
+ 166   6                              ToggleSegs(dir);
+ 167   6                              new_second_flag_setting = 0;
+ 168   6                          }
+ 169   5                          if (UP_KEY == 0)
+ 170   5                          {
+ 171   6                              DelayMS(100);
+ 172   6                              if (UP_KEY == 0)
+ 173   6                                  light_time[dir][color]++;
+ 174   6                          }
+ 175   5                          if (DOWN_KEY == 0)
+ 176   5                          {
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 22:25:42 PAGE 4   
 
- 177   5                          if (UP_KEY == 0)
- 178   5                          {
- 179   6                              DelayMS(100);
- 180   6                              if (UP_KEY == 0)
- 181   6                                  light_time[dir][color]++;
- 182   6                          }
- 183   5                          if (DOWN_KEY == 0)
- 184   5                          {
- 185   6                              DelayMS(100);
- 186   6                              if (DOWN_KEY == 0)
- 187   6                                  light_time[dir][color]--;
- 188   6                          }
- 189   5                      }
- 190   4                  }
- 191   3                  DisplayDigit(light_time[dir][RED], dir);
- 192   3              }
- 193   2          }
- 194   1          ClockReset();       // 重置时钟
- 195   1          TrafficLightInit(); // 重新初始化
- 196   1          mode = RUNNING;
- 197   1          // EA = 1;
- 198   1      }
- 199          
- 200          void ClockReset()
- 201          {
- 202   1          // @brief 重置定时器0以及毫秒、秒计数器
- 203   1          TR0 = 0;    // 定时器0开始计时
- 204   1          ET0 = 0;    // 关闭定时器0中断
- 205   1          TL0 = 0x20; // 设置定时初始值
- 206   1          TH0 = 0xD1; // 设置定时初始值
- 207   1          milliseconds = 0;
- 208   1          seconds = 0;
- 209   1          ET0 = 1;
- 210   1          TR0 = 1; // 定时器0开始计时
- 211   1      }
- 212          
- 213          void ToggleSegs(direction dir)
- 214          {
- 215   1          // @note: 向方向写入DONT_DISPLAY可以使数码管熄灭
- 216   1          static uchar ON[4] = {1, 1, 1, 1}; // 4个方向的开关状态
- 217   1          if (ON[dir] == 1)
- 218   1          {
- 219   2              DisplayDigit(DONT_DISPLAY, dir);
- 220   2              ON[dir] = 0;
- 221   2          }
- 222   1          else
- 223   1          {
- 224   2              DisplayDigit(last_display_val[dir], dir);
- 225   2              ON[dir] = 1;
- 226   2          }
- 227   1      }
- 228          
- 229          void SetLedColor(direction dir, TrafficLightColor color)
- 230          {
- 231   1          /**
- 232   1           * @brief 设置dir方向的灯色
- 233   1           * @ref 参见TrafficLight枚举
- 234   1           * @warning 在高频调用该函数时会使输出电平出现暂态，影响稳定性
- 235   1           */
- 236   1          SetLedBit(GetDstLed(dir, current_color[dir]), LED_OFF);
- 237   1          SetLedBit(GetDstLed(dir, color), LED_ON);
- 238   1          current_color[dir] = color;
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 21:01:35 PAGE 5   
+ 177   6                              DelayMS(100);
+ 178   6                              if (DOWN_KEY == 0)
+ 179   6                                  light_time[dir][color]--;
+ 180   6                          }
+ 181   5                      }
+ 182   4                  }
+ 183   3                  DisplayDigit(light_time[dir][RED], dir);
+ 184   3              }
+ 185   2          }
+ 186   1          ClockReset();       // 重置时钟
+ 187   1          TrafficLightInit(); // 重新初始化
+ 188   1          // EA = 1;
+ 189   1      }
+ 190          
+ 191          void ClockReset()
+ 192          {
+ 193   1          // @brief 重置定时器0以及毫秒、秒计数器
+ 194   1          TR0 = 0;    // 定时器0开始计时
+ 195   1          ET0 = 0;    // 关闭定时器0中断
+ 196   1          TL0 = 0x20; // 设置定时初始值
+ 197   1          TH0 = 0xD1; // 设置定时初始值
+ 198   1          milliseconds = 0;
+ 199   1          seconds = 0;
+ 200   1          ET0 = 1;
+ 201   1          TR0 = 1; // 定时器0开始计时
+ 202   1      }
+ 203          
+ 204          void ToggleSegs(direction dir)
+ 205          {
+ 206   1          // @note: 向方向写入DONT_DISPLAY可以使数码管熄灭
+ 207   1          static uchar ON[4] = {1, 1, 1, 1}; // 4个方向的开关状态
+ 208   1          if (ON[dir] == 1)
+ 209   1          {
+ 210   2              DisplayDigit(DONT_DISPLAY, dir);
+ 211   2              ON[dir] = 0;
+ 212   2          }
+ 213   1          else
+ 214   1          {
+ 215   2              DisplayDigit(last_display_val[dir], dir);
+ 216   2              ON[dir] = 1;
+ 217   2          }
+ 218   1      }
+ 219          
+ 220          void SetLedColor(direction dir, TrafficLightColor color)
+ 221          {
+ 222   1          /**
+ 223   1           * @brief 设置dir方向的灯色
+ 224   1           * @ref 参见TrafficLight枚举
+ 225   1           * @warning 在高频调用该函数时会使输出电平出现暂态，影响稳定性
+ 226   1           */
+ 227   1          SetLedBit(LED_MAP[dir][current_color[dir]], LED_OFF);
+ 228   1          SetLedBit(LED_MAP[dir][color], LED_ON);
+ 229   1          // SetLedBit(GetDstLed(dir, current_color[dir]), LED_OFF);
+ 230   1          // SetLedBit(GetDstLed(dir, color), LED_ON);
+ 231   1          current_color[dir] = color;
+ 232   1      }
+ 233          
+ 234          void EmergencyMain()
+ 235          {
+ 236   1          direction dir;
+ 237   1          new_second_flag_emergency = 0;
+ 238   1          for (dir = EAST; dir < DIRECTION_MAX; dir++)
+C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 22:25:42 PAGE 5   
 
- 239   1      }
- 240          
- 241          uchar GetDstLed(direction dir, TrafficLightColor color)
- 242          {
- 243   1          /**
- 244   1           * @brief 获取dir方向color颜色的LED对应的LEDs枚举变量
- 245   1           */
- 246   1          uchar dst_led = 0;
- 247   1          switch (dir)
- 248   1          {
- 249   2          case NORTH:
- 250   2              dst_led = 0;
- 251   2              break;
- 252   2          case WEST:
- 253   2              dst_led = 3;
- 254   2              break;
- 255   2          case SOUTH:
- 256   2              dst_led = 6;
- 257   2              break;
- 258   2          case EAST:
- 259   2              dst_led = 9;
- 260   2              break;
- 261   2          default:
- 262   2              break;
- 263   2          }
- 264   1          switch (color)
- 265   1          {
- 266   2          case GREEN:
- 267   2              break;
- 268   2          case YELLOW:
- 269   2              dst_led += 1;
- 270   2              break;
- 271   2          case RED:
- 272   2              dst_led += 2;
- 273   2              break;
- 274   2          default:
- 275   2              break;
- 276   2          }
- 277   1          return dst_led;
- 278   1      }
- 279          
- 280          void EmergencyMain()
- 281          {
- 282   1      }
- 283          
- 284          void LoadDefaultTime()
- 285          {
- 286   1          // 加载初始状态各路口时间
- 287   1          light_time[EAST][RED] = 60, light_time[EAST][YELLOW] = 5, light_time[EAST][GREEN] = 15;
- 288   1          light_time[SOUTH][RED] = 60, light_time[SOUTH][YELLOW] = 5, light_time[SOUTH][GREEN] = 15;
- 289   1          light_time[WEST][RED] = 60, light_time[WEST][YELLOW] = 5, light_time[WEST][GREEN] = 15;
- 290   1          light_time[NORTH][RED] = 60, light_time[NORTH][YELLOW] = 5, light_time[NORTH][GREEN] = 15;
- 291   1      }
+ 239   1              SetLedColor(dir, YELLOW);
+ 240   1          while (mode == EMERGENCY)
+ 241   1          {
+ 242   2              if (new_second_flag_emergency)
+ 243   2              {
+ 244   3                  for (dir = EAST; dir < DIRECTION_MAX; dir++)
+ 245   3                  {
+ 246   4                      DisplayDigit(DONT_DISPLAY, dir);
+ 247   4                      ToggleLedBit(LED_MAP[dir][YELLOW]);
+ 248   4                  }
+ 249   3                  new_second_flag_emergency = 0;
+ 250   3              }
+ 251   2          }
+ 252   1          TrafficLightInit(); // 恢复正常运行模式
+ 253   1      }
+ 254          
+ 255          void LoadDefaultTime()
+ 256          {
+ 257   1          // 加载初始状态各路口时间
+ 258   1          light_time[EAST][RED] = 60, light_time[EAST][YELLOW] = 5, light_time[EAST][GREEN] = 15;
+ 259   1          light_time[SOUTH][RED] = 60, light_time[SOUTH][YELLOW] = 5, light_time[SOUTH][GREEN] = 15;
+ 260   1          light_time[WEST][RED] = 60, light_time[WEST][YELLOW] = 5, light_time[WEST][GREEN] = 15;
+ 261   1          light_time[NORTH][RED] = 60, light_time[NORTH][YELLOW] = 5, light_time[NORTH][GREEN] = 15;
+ 262   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    862    ----
-   CONSTANT SIZE    =      8    ----
+   CODE SIZE        =    904    ----
+   CONSTANT SIZE    =     20    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     31       7
+   DATA SIZE        =     31       8
    IDATA SIZE       =   ----    ----
-C51 COMPILER V9.60.0.0   TRAFFIC_LIGHT                                                     12/14/2022 21:01:35 PAGE 6   
-
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.
 
