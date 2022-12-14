@@ -21,15 +21,15 @@ void TrafficLightInit()
         SetLedBit(i, LED_OFF);
     }
     // 初始状态
-    red_time[EAST] = 60, yellow_time[EAST] = 10, green_time[EAST] = 20;
-    red_time[SOUTH] = 60, yellow_time[SOUTH] = 10, green_time[SOUTH] = 20;
-    red_time[WEST] = 60, yellow_time[WEST] = 10, green_time[WEST] = 20;
-    red_time[NORTH] = 60, yellow_time[NORTH] = 10, green_time[NORTH] = 20;
+    red_time[EAST] = 60, yellow_time[EAST] = 5, green_time[EAST] = 15;
+    red_time[SOUTH] = 60, yellow_time[SOUTH] = 5, green_time[SOUTH] = 15;
+    red_time[WEST] = 60, yellow_time[WEST] = 5, green_time[WEST] = 15;
+    red_time[NORTH] = 60, yellow_time[NORTH] = 5, green_time[NORTH] = 15;
 
-    remain_time[EAST] = green_time[EAST];
-    remain_time[SOUTH] = red_time[SOUTH];
-    remain_time[NORTH] = red_time[NORTH];
-    remain_time[WEST] = red_time[WEST];
+    remain_time[EAST] = 15;
+    remain_time[SOUTH] = 20;
+    remain_time[WEST] = 40;
+    remain_time[NORTH] = 60;
 
     SetLedColor(EAST, GREEN);
     SetLedColor(SOUTH, RED);
@@ -92,7 +92,7 @@ void DisplayDigit(uchar val, direction dir)
     Write7219(TENS_BIT[dir], tens);
 
     if (val == DONT_DISPLAY)
-        last_display_val[dir] = last_display_val[dir];
+        last_display_val[dir] = last_display_val[dir]; // 不保存空白位置
     else
         last_display_val[dir] = val;
 }
