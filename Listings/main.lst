@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-C51 COMPILER V9.60.0.0   MAIN                                                              12/13/2022 22:24:31 PAGE 1   
-=======
-C51 COMPILER V9.60.0.0   MAIN                                                              12/13/2022 09:20:18 PAGE 1   
->>>>>>> 3f15c7988e679a888b842c010a439492e67b8d3b
+C51 COMPILER V9.60.0.0   MAIN                                                              12/14/2022 09:33:17 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
@@ -13,7 +9,6 @@ COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE 
 line level    source
 
    1          #include "headfile.h"
-<<<<<<< HEAD
    2          
    3          void InterruptKey() interrupt 0
    4          {
@@ -42,15 +37,15 @@ line level    source
   27   1        EX0 = 1; // 外部中断
   28   1        Init7219();
   29   1      
-  30   1        DisplayDigit(1, EAST);
-  31   1        DisplayDigit(10, SOUTH);
-  32   1        DisplayDigit(50, WEST);
-  33   1        DisplayDigit(99, NORTH);
+  30   1        // DisplayDigit(1, EAST);
+  31   1        // DisplayDigit(10, SOUTH);
+  32   1        // DisplayDigit(50, WEST);
+  33   1        // DisplayDigit(99, NORTH);
   34   1      
-  35   1        SetLedColor(SOUTH, GREEN);
-  36   1        SetLedColor(NORTH, RED);
-  37   1        SetLedColor(WEST, RED);
-  38   1        SetLedColor(EAST, YELLOW);
+  35   1        // SetLedColor(SOUTH, GREEN);
+  36   1        // SetLedColor(NORTH, RED);
+  37   1        // SetLedColor(WEST, RED);
+  38   1        // SetLedColor(EAST, YELLOW);
   39   1      
   40   1        DelayMS(500);
   41   1        while (1)
@@ -65,86 +60,16 @@ line level    source
   50   3          }
   51   2          if (mode == DEBUGGING)
   52   2          {
-  53   3      
-  54   3            // TrafficLight();
-C51 COMPILER V9.60.0.0   MAIN                                                              12/13/2022 22:24:31 PAGE 2   
+  53   3            TrafficLight();
+  54   3          }
+C51 COMPILER V9.60.0.0   MAIN                                                              12/14/2022 09:33:17 PAGE 2   
 
-  55   3          }
-  56   2        }
-  57   1      }
-
-
-MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    186    ----
-=======
-   2          uchar digit_codes[] = {0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xf8,
-   3                       0x80, 0x90, 0x88, 0x83, 0xc6, 0xa1, 0x86, 0x8e}; // 数码管段码
-   4          uchar Flash_Count = 0, Operation_Type = 1;                // 闪烁次数，操作类型变量
-   5          uchar out_series[HC595_CNT * 8] = {0};
-   6          uint i = 0;
-   7          uint pre_second = 0;
-   8          ushort foo = 0;
-   9          
-  10          void InterruptKey() interrupt 0
-  11          {
-  12   1        if (mode < FUNC_MAX)
-  13   1        {
-  14   2          mode++;
-  15   2        }
-  16   1        else
-  17   1        {
-  18   2          mode = RUNNING;
-  19   2        }
-  20   1      }
-  21          
-  22          void InterruptTimer0() interrupt 1
-  23          {
-  24   1        UpdateTimer0();
-  25   1      }
-  26          
-  27          // 主程序
-  28          void main()
-  29          {
-  30   1        Timer0Init();
-  31   1        TrafficLightInit();
-  32   1        EA = 1;
-  33   1        ET0 = 1;
-  34   1        EX0 = 1; // 外部中断
-  35   1        Init7219();
-  36   1      
-  37   1        DisplayDigit(1, EAST);
-  38   1        DisplayDigit(10, SOUTH);
-  39   1        DisplayDigit(50, WEST);
-  40   1        DisplayDigit(99, NORTH);
-  41   1      
-  42   1        SetLedBit(NORTH_RED, LED_OFF);
-  43   1        SetLedBit(NORTH_YELLOW, LED_OFF);
-  44   1        SetLedBit(NORTH_GREEN, LED_ON);
-  45   1      
-  46   1        DelayMS(500);
-  47   1        while (1)
-  48   1        {
-  49   2          if (mode == RUNNING)
-  50   2          {
-  51   3            TrafficLight();
-  52   3          }
-  53   2          if (mode == SETTING)
-  54   2          {
-C51 COMPILER V9.60.0.0   MAIN                                                              12/13/2022 09:20:18 PAGE 2   
-
-  55   3            Setting();
-  56   3          }
-  57   2          if (mode == DEBUGGING)
-  58   2          {
-  59   3            TrafficLight();
-  60   3          }
-  61   2        }
-  62   1      }
+  55   2        }
+  56   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    184    ----
->>>>>>> 3f15c7988e679a888b842c010a439492e67b8d3b
+   CODE SIZE        =    135    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

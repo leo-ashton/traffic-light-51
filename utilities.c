@@ -69,6 +69,10 @@ void SetLedBit(LEDs led, bit status)
 
 void ToggleLedBit(LEDs led)
 {
+    /**
+     * @brief 翻转led
+     * @warning 注意输入变量是否为LEDs枚举变量
+     */
     led_status[led] = !led_status[led];
     Hc595SendMultiByte(
         BinarySeries2ushort(led_status,

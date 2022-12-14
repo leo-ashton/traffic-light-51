@@ -27,15 +27,15 @@ void main()
 	EX0 = 1; // 外部中断
 	Init7219();
 
-	DisplayDigit(1, EAST);
-	DisplayDigit(10, SOUTH);
-	DisplayDigit(50, WEST);
-	DisplayDigit(99, NORTH);
+	// DisplayDigit(1, EAST);
+	// DisplayDigit(10, SOUTH);
+	// DisplayDigit(50, WEST);
+	// DisplayDigit(99, NORTH);
 
-	SetLedColor(SOUTH, GREEN);
-	SetLedColor(NORTH, RED);
-	SetLedColor(WEST, RED);
-	SetLedColor(EAST, YELLOW);
+	// SetLedColor(SOUTH, GREEN);
+	// SetLedColor(NORTH, RED);
+	// SetLedColor(WEST, RED);
+	// SetLedColor(EAST, YELLOW);
 
 	DelayMS(500);
 	while (1)
@@ -50,7 +50,7 @@ void main()
 		}
 		if (mode == DEBUGGING)
 		{
-			// TrafficLight();
+			TrafficLight();
 		}
 	}
 }

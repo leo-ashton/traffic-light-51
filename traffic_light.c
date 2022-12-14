@@ -11,6 +11,7 @@ uchar red_time[4];
 uchar yellow_time[4];
 uchar green_time[4];
 uchar current_color[4];
+TrafficLightColor next_status;
 
 void TrafficLightInit()
 {
@@ -30,10 +31,10 @@ void TrafficLightInit()
     remain_time[NORTH] = red_time[NORTH];
     remain_time[WEST] = red_time[WEST];
 
-    current_color[EAST] = GREEN;
-    current_color[SOUTH] = RED;
-    current_color[WEST] = RED;
-    current_color[NORTH] = RED;
+    SetLedColor(EAST, GREEN);
+    SetLedColor(SOUTH, RED);
+    SetLedColor(WEST, RED);
+    SetLedColor(NORTH, RED);
 }
 
 void Write7219(unsigned char address, unsigned char dat)
@@ -109,6 +110,7 @@ uchar GetReloadValue(TrafficLightColor next_status, direction dir)
     default:
         break;
     }
+    return 0;
 }
 
 void DisplayDigitDemo()
@@ -126,7 +128,7 @@ void DisplayDigitDemo()
 
 void TrafficLight()
 {
-    uchar dir;
+    direction dir;
     if (new_second_flag)
     {
         for (dir = 0; dir < DIRECTION_MAX; dir++)
@@ -134,17 +136,17 @@ void TrafficLight()
             remain_time[dir]--;       // 各方向倒计时更新
             if (remain_time[dir] < 5) // 判断是否需要闪烁
             {
-                ToggleLedBit(dir);
             }
-            if (remain_time[dir] < 0)
+            if (remain_time[dir] <= 0)
             {
                 // 装载下一个状态
-                remain_time[dir] = GetReloadValue(dir, current_color[dir]);
+                next_status = (current_color[dir] + 1 >= TRAFFIC_LIGHT_STATUS_MAX) ? (RED) : (current_color[dir] + 1);
+                remain_time[dir] = GetReloadValue(next_status, dir);
+                SetLedColor(dir, next_status);
             }
 
-            // 显示结果
+            // 数码管显示剩余秒数
             DisplayDigit(remain_time[dir], dir);
-            // SetLedColor(dir, );
         }
         new_second_flag = 0; // 清除标志位
     }

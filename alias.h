@@ -61,8 +61,8 @@ typedef enum direction
 typedef enum TrafficLightColor
 {
     RED,
-    YELLOW,
     GREEN,
+    YELLOW,
     TRAFFIC_LIGHT_STATUS_MAX
 } TrafficLightColor;
 
