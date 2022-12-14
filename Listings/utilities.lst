@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 09:33:17 PAGE 1   
+C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 15:03:41 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE UTILITIES
@@ -20,89 +20,118 @@ line level    source
   10   1                  ;
   11   1      }
   12          
-  13          void Hc595SendMultiByte(unsigned short dat)
+  13          bit Wait4Key(uint max_wait_time, bit key_pin, uchar *timeout_flag)
   14          {
   15   1          /**
-  16   1           * @brief 向HC595发送数据，并并行输出；dat的高8位在第二块HC595（东边的三个灯
+  16   1           * @brief 等待按键输入，等待wait_time后如无输入则返回
+  17   1           * @param max_wait_time 最大返回时间
+  18   1           * @param key_pin 按键所在的引脚
+  19   1           * @return 如在wait_time期间按键电平发生变化，返回消抖后的按键信息；否则返�
+             -��初始时候
+  20   1           */
+  21   1          uchar i;
+  22   1          bit in_status = key_pin; // 进入程序时的引脚状态
+  23   1          bit ret = in_status;
+  24   1          while (max_wait_time--)
+  25   1          {
+  26   2              for (i = 0; i < 120; i++)
+  27   2                  if (key_pin == 0)
+  28   2                  {
+  29   3                      DelayMS(50); // 消抖延时
+  30   3                      if (key_pin != in_status)
+  31   3                      {
+  32   4                          *timeout_flag = 0;
+  33   4                          return (bit)key_pin; // 如果按键电平发生了变化，则直接返回
+  34   4                      }
+  35   3                  }
+  36   2          }
+  37   1          *timeout_flag = 1;
+  38   1      }
+  39          
+  40          void Hc595SendMultiByte(unsigned short dat)
+  41          {
+  42   1          /**
+  43   1           * @brief 向HC595发送数据，并并行输出；dat的高8位在第二块HC595（东边的三个灯
              -所在的那片），低8位在第一块HC595
-  17   1           */
-  18   1          uchar a;
-  19   1      
-  20   1          SRCLK = 1;
-  21   1          RCLK = 1;
-  22   1      
-  23   1          for (a = 0; a < sizeof(dat) * 8; a++) // 发送8位数
-  24   1          {
-  25   2              SER = dat >> ((sizeof(dat) * 8) - 1); // 从最高位开始发送
-  26   2              dat <<= 1;
-  27   2      
-  28   2              SRCLK = 0; // 发送时序
-  29   2              _nop_();
-  30   2              _nop_();
-  31   2              SRCLK = 1;
-  32   2          }
-  33   1          RCLK = 0;
-  34   1          _nop_();
-  35   1          _nop_();
-  36   1          RCLK = 1;
-  37   1      }
-  38          
-  39          unsigned short BinarySeries2ushort(uchar series[], uchar len)
-  40          {
-  41   1          /**
-  42   1           * @brief 将二进制序列数组转换为对应的十进制数
-  43   1           * @param series 高位在前的二进制序列
-  44   1           * @return 转换的十进制数
-  45   1           */
-  46   1          // TODO implement this
-  47   1          static ushort ret;
-  48   1          static uchar i;
-  49   1          for (i = 0, ret = 0; i < len; i++)
-  50   1          {
-  51   2              ret += (series[i] << i);
-  52   2          }
-  53   1      
-C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 09:33:17 PAGE 2   
+  44   1           */
+  45   1          uchar a;
+  46   1      
+  47   1          SRCLK = 1;
+  48   1          RCLK = 1;
+  49   1      
+  50   1          for (a = 0; a < sizeof(dat) * 8; a++) // 发送8位数
+  51   1          {
+  52   2              SER = dat >> ((sizeof(dat) * 8) - 1); // 从最高位开始发送
+C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 15:03:41 PAGE 2   
 
-  54   1          return ret;
-  55   1      }
-  56          
-  57          void SetLedBit(LEDs led, bit status)
-  58          {
-  59   1          /**
-  60   1           * @brief 设置某位LED的状态。这是唯一允许的操作LED的方式。
-  61   1           * @param led 枚举类型变量，操作的LED位
-  62   1           */
-  63   1          led_status[led] = status;
-  64   1          Hc595SendMultiByte(
-  65   1              BinarySeries2ushort(led_status,
-  66   1                                  sizeof(led_status) / sizeof(led_status[0])));
-  67   1          // last_led_status[led] = status;
-  68   1      }
-  69          
-  70          void ToggleLedBit(LEDs led)
-  71          {
-  72   1          /**
-  73   1           * @brief 翻转led
-  74   1           * @warning 注意输入变量是否为LEDs枚举变量
-  75   1           */
-  76   1          led_status[led] = !led_status[led];
-  77   1          Hc595SendMultiByte(
-  78   1              BinarySeries2ushort(led_status,
-  79   1                                  sizeof(led_status) / sizeof(led_status[0])));
-  80   1          // last_led_status[led] = led_status[led];
-  81   1      }
+  53   2              dat <<= 1;
+  54   2      
+  55   2              SRCLK = 0; // 发送时序
+  56   2              _nop_();
+  57   2              _nop_();
+  58   2              SRCLK = 1;
+  59   2          }
+  60   1          RCLK = 0;
+  61   1          _nop_();
+  62   1          _nop_();
+  63   1          RCLK = 1;
+  64   1      }
+  65          
+  66          unsigned short BinarySeries2ushort(uchar series[], uchar len)
+  67          {
+  68   1          /**
+  69   1           * @brief 将二进制序列数组转换为对应的十进制数
+  70   1           * @param series 高位在前的二进制序列
+  71   1           * @return 转换的十进制数
+  72   1           */
+  73   1          // TODO implement this
+  74   1          static ushort ret;
+  75   1          static uchar i;
+  76   1          for (i = 0, ret = 0; i < len; i++)
+  77   1          {
+  78   2              ret += (series[i] << i);
+  79   2          }
+  80   1      
+  81   1          return ret;
+  82   1      }
+  83          
+  84          void SetLedBit(LEDs led, bit status)
+  85          {
+  86   1          /**
+  87   1           * @brief 设置某位LED的状态。这是唯一允许的操作LED的方式。
+  88   1           * @param led 枚举类型变量，操作的LED位
+  89   1           */
+  90   1          led_status[led] = status;
+  91   1          Hc595SendMultiByte(
+  92   1              BinarySeries2ushort(led_status,
+  93   1                                  sizeof(led_status) / sizeof(led_status[0])));
+  94   1      }
+  95          
+  96          void ToggleLedBit(LEDs led)
+  97          {
+  98   1          /**
+  99   1           * @brief 翻转led
+ 100   1           * @warning 注意输入变量是否为LEDs枚举变量
+ 101   1           */
+ 102   1          led_status[led] = !led_status[led];
+ 103   1          Hc595SendMultiByte(
+ 104   1              BinarySeries2ushort(led_status,
+ 105   1                                  sizeof(led_status) / sizeof(led_status[0])));
+ 106   1      }
+*** WARNING C291 IN LINE 38 OF utilities.c: not every exit path returns a value
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    190    ----
+   CODE SIZE        =    273    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     15       3
+C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 15:03:41 PAGE 3   
+
+   DATA SIZE        =     15       8
    IDATA SIZE       =   ----    ----
-   BIT SIZE         =   ----       1
+   BIT SIZE         =   ----       4
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

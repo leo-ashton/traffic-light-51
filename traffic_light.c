@@ -15,10 +15,14 @@ TrafficLightColor next_status;
 
 void TrafficLightInit()
 {
+    /**
+     * @brief 初始化交通灯的值
+     * @todo 注意修改初始时间
+     */
     uchar i;
     for (i = 0; i < TRAFFIC_LIGHT_MAX; i++)
     {
-        SetLedBit(i, LED_OFF);
+        SetLedBit(i, LED_OFF); // 关掉所有灯
     }
     // 初始状态
     red_time[EAST] = 60, yellow_time[EAST] = 5, green_time[EAST] = 15;
@@ -136,6 +140,8 @@ void TrafficLight()
             remain_time[dir]--;       // 各方向倒计时更新
             if (remain_time[dir] < 5) // 判断是否需要闪烁
             {
+                if (current_color[dir] == YELLOW)
+                    ToggleLedBit(GetDstLed(dir, YELLOW));
             }
             if (remain_time[dir] <= 0)
             {
@@ -156,13 +162,30 @@ void TrafficLight()
 
 void Setting()
 {
+    // EA = 0;
     direction dir = NORTH;
-    while (mode == SETTING)
+    uchar time_out_flag = 0;
+    TrafficLightColor color = RED;
+    for (dir = EAST; dir < DIRECTION_MAX; dir++)
+        SetLedColor(dir, RED); // 全部置为红灯
+    for (dir = EAST; dir < DIRECTION_MAX; dir++)
     {
-        ToggleSegs(dir);
-        DelayMS(1000);
+        while (mode == SETTING)
+        {
+            if (new_second_flag)
+            {
+                ToggleSegs(dir);
+                new_second_flag = 0;
+            }
+            if (UP_KEY == 0)
+            {
+            }
+        }
     }
-    ClockReset();
+    ClockReset();       // 重置时钟
+    TrafficLightInit(); // 重新初始化
+    mode = RUNNING;
+    // EA = 1;
 }
 
 void ClockReset()

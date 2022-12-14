@@ -10,6 +10,33 @@ void DelayMS(uint x)
             ;
 }
 
+bit Wait4Key(uint max_wait_time, bit key_pin, uchar *timeout_flag)
+{
+    /**
+     * @brief 等待按键输入，等待wait_time后如无输入则返回
+     * @param max_wait_time 最大返回时间
+     * @param key_pin 按键所在的引脚
+     * @return 如在wait_time期间按键电平发生变化，返回消抖后的按键信息；否则返回初始时候
+     */
+    uchar i;
+    bit in_status = key_pin; // 进入程序时的引脚状态
+    bit ret = in_status;
+    while (max_wait_time--)
+    {
+        for (i = 0; i < 120; i++)
+            if (key_pin == 0)
+            {
+                DelayMS(50); // 消抖延时
+                if (key_pin != in_status)
+                {
+                    *timeout_flag = 0;
+                    return (bit)key_pin; // 如果按键电平发生了变化，则直接返回
+                }
+            }
+    }
+    *timeout_flag = 1;
+}
+
 void Hc595SendMultiByte(unsigned short dat)
 {
     /**
@@ -64,7 +91,6 @@ void SetLedBit(LEDs led, bit status)
     Hc595SendMultiByte(
         BinarySeries2ushort(led_status,
                             sizeof(led_status) / sizeof(led_status[0])));
-    // last_led_status[led] = status;
 }
 
 void ToggleLedBit(LEDs led)
@@ -77,5 +103,4 @@ void ToggleLedBit(LEDs led)
     Hc595SendMultiByte(
         BinarySeries2ushort(led_status,
                             sizeof(led_status) / sizeof(led_status[0])));
-    // last_led_status[led] = led_status[led];
 }

@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MAIN                                                              12/14/2022 09:33:17 PAGE 1   
+C51 COMPILER V9.60.0.0   MAIN                                                              12/14/2022 15:03:41 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
@@ -12,64 +12,58 @@ line level    source
    2          
    3          void InterruptKey() interrupt 0
    4          {
-   5   1        if (mode < FUNC_MAX)
-   6   1        {
-   7   2          mode++;
-   8   2        }
-   9   1        else
-  10   1        {
-  11   2          mode = RUNNING;
-  12   2        }
-  13   1      }
-  14          
-  15          void InterruptTimer0() interrupt 1
-  16          {
-  17   1        UpdateTimer0();
-  18   1      }
-  19          
-  20          // 主程序
-  21          void main()
-  22          {
-  23   1        Timer0Init();
-  24   1        TrafficLightInit();
-  25   1        EA = 1;
-  26   1        ET0 = 1;
-  27   1        EX0 = 1; // 外部中断
-  28   1        Init7219();
-  29   1      
-  30   1        // DisplayDigit(1, EAST);
-  31   1        // DisplayDigit(10, SOUTH);
-  32   1        // DisplayDigit(50, WEST);
-  33   1        // DisplayDigit(99, NORTH);
-  34   1      
-  35   1        // SetLedColor(SOUTH, GREEN);
-  36   1        // SetLedColor(NORTH, RED);
-  37   1        // SetLedColor(WEST, RED);
-  38   1        // SetLedColor(EAST, YELLOW);
-  39   1      
-  40   1        DelayMS(500);
-  41   1        while (1)
-  42   1        {
-  43   2          if (mode == RUNNING)
-  44   2          {
-  45   3            TrafficLight();
-  46   3          }
-  47   2          if (mode == SETTING)
-  48   2          {
-  49   3            Setting();
-  50   3          }
-  51   2          if (mode == DEBUGGING)
-  52   2          {
-  53   3            TrafficLight();
-  54   3          }
-C51 COMPILER V9.60.0.0   MAIN                                                              12/14/2022 09:33:17 PAGE 2   
-
-  55   2        }
-  56   1      }
+   5   1        EA = 0;
+   6   1        if (mode < FUNC_MAX)
+   7   1        {
+   8   2          mode++;
+   9   2        }
+  10   1        else
+  11   1        {
+  12   2          mode = RUNNING;
+  13   2        }
+  14   1        EA = 1;
+  15   1      }
+  16          
+  17          void InterruptTimer0() interrupt 1
+  18          {
+  19   1        EA = 0;
+  20   1        UpdateTimer0();
+  21   1        EA = 1;
+  22   1      }
+  23          
+  24          // 主程序
+  25          void main()
+  26          {
+  27   1        Timer0Init();
+  28   1        TrafficLightInit();
+  29   1        EA = 1;
+  30   1        ET0 = 1;
+  31   1        EX0 = 1; // 外部中断
+  32   1        Init7219();
+  33   1      
+  34   1        DelayMS(500);
+  35   1        while (1)
+  36   1        {
+  37   2          if (mode == RUNNING)
+  38   2          {
+  39   3            TrafficLight();
+  40   3          }
+  41   2          if (mode == SETTING)
+  42   2          {
+  43   3            Setting();
+  44   3          }
+  45   2          if (mode == DEBUGGING)
+  46   2          {
+  47   3            TrafficLight();
+  48   3          }
+  49   2        }
+  50   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    135    ----
+   CODE SIZE        =    143    ----
+C51 COMPILER V9.60.0.0   MAIN                                                              12/14/2022 15:03:41 PAGE 2   
+
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
