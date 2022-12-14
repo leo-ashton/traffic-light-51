@@ -35,6 +35,7 @@ bit Wait4Key(uint max_wait_time, bit key_pin, uchar *timeout_flag)
             }
     }
     *timeout_flag = 1;
+    return in_status;
 }
 
 void Hc595SendMultiByte(unsigned short dat)

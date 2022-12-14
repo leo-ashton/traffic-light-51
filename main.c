@@ -3,13 +3,17 @@
 void InterruptKey() interrupt 0
 {
 	EA = 0;
-	if (mode < FUNC_MAX)
+	// DelayMS(100);
+	if (MODE_KEY == 0)
 	{
-		mode++;
-	}
-	else
-	{
-		mode = RUNNING;
+		if (mode < FUNC_MAX)
+		{
+			mode++;
+		}
+		else
+		{
+			mode = RUNNING;
+		}
 	}
 	EA = 1;
 }
@@ -25,10 +29,12 @@ void InterruptTimer0() interrupt 1
 void main()
 {
 	Timer0Init();
+	LoadDefaultTime();
 	TrafficLightInit();
 	EA = 1;
 	ET0 = 1;
 	EX0 = 1; // 外部中断
+	IT0 = 1; // 下降沿触发
 	Init7219();
 
 	DelayMS(500);
@@ -36,15 +42,19 @@ void main()
 	{
 		if (mode == RUNNING)
 		{
-			TrafficLight();
+			TrafficLightMain();
 		}
 		if (mode == SETTING)
 		{
-			Setting();
+			SettingMain();
 		}
 		if (mode == DEBUGGING)
 		{
-			TrafficLight();
+			SettingMain();
+		}
+		if (mode == EMERGENCY)
+		{
+			EmergencyMain();
 		}
 	}
 }

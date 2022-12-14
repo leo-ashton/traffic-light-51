@@ -1,6 +1,6 @@
 #include "headfile.h"
 
-uchar mode = DEBUGGING;
+uchar mode = SETTING;
 ushort seconds = 0;      // 本周期经过的秒数
 ushort milliseconds = 0; // 毫秒数,为1000时令seconds++
 ushort cycle = 180;      // 红绿灯运行一轮的周期

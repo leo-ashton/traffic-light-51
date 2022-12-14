@@ -7,7 +7,7 @@ static uchar last_display_val[DIRECTION_MAX];
 digs_addr code ONES_BIT[] = {EAST_ONES, SOUTH_ONES, WEST_ONES, NORTH_ONES};
 digs_addr code TENS_BIT[] = {EAST_TENS, SOUTH_TENS, WEST_TENS, NORTH_TENS};
 uchar remain_time[DIRECTION_MAX];
-uchar light_time[DIRECTION_MAX][3]; // 存放四个方向的三色灯的设置时间
+uchar light_time[DIRECTION_MAX][3]; // 存放四个方向的三色灯的设置时间,第一维度为dir,第二维度为color
 uchar current_color[DIRECTION_MAX];
 TrafficLightColor next_status;
 
@@ -22,16 +22,16 @@ void TrafficLightInit()
     {
         SetLedBit(i, LED_OFF); // 关掉所有灯
     }
-    // 初始状态
-    light_time[EAST][RED] = 60, light_time[EAST][YELLOW] = 5, light_time[EAST][GREEN] = 15;
-    light_time[SOUTH][RED] = 60, light_time[SOUTH][YELLOW] = 5, light_time[SOUTH][GREEN] = 15;
-    light_time[WEST][RED] = 60, light_time[WEST][YELLOW] = 5, light_time[WEST][GREEN] = 15;
-    light_time[NORTH][RED] = 60, light_time[NORTH][YELLOW] = 5, light_time[NORTH][GREEN] = 15;
 
-    remain_time[EAST] = 15;
-    remain_time[SOUTH] = 20;
-    remain_time[WEST] = 40;
-    remain_time[NORTH] = 60;
+    remain_time[EAST] = light_time[EAST][GREEN];
+    remain_time[SOUTH] = remain_time[EAST] + light_time[EAST][YELLOW];
+    remain_time[WEST] = remain_time[SOUTH] + light_time[SOUTH][GREEN] + light_time[SOUTH][YELLOW];
+    remain_time[NORTH] = remain_time[WEST] + light_time[WEST][GREEN] + light_time[WEST][YELLOW];
+
+    // remain_time[EAST] = 15;
+    // remain_time[SOUTH] = 20;
+    // remain_time[WEST] = 40;
+    // remain_time[NORTH] = 60;
 
     SetLedColor(EAST, GREEN);
     SetLedColor(SOUTH, RED);
@@ -112,7 +112,7 @@ void DisplayDigitDemo()
     // Write7219(1, 15); // 15为全灭
 }
 
-void TrafficLight()
+void TrafficLightMain()
 {
     direction dir;
     if (new_second_flag)
@@ -143,26 +143,52 @@ void TrafficLight()
         return;
 }
 
-void Setting()
+void SettingMain()
 {
-    // EA = 0;
-    direction dir = NORTH;
+    direction dir = EAST;
     uchar time_out_flag = 0;
     TrafficLightColor color = RED;
-    for (dir = EAST; dir < DIRECTION_MAX; dir++)
-        SetLedColor(dir, RED); // 全部置为红灯
+
     for (dir = EAST; dir < DIRECTION_MAX; dir++)
     {
-        while (mode == SETTING)
+        SetLedColor(dir, RED); // 全部置为红灯
+    }
+
+    while (mode == SETTING)
+    {
+        for (dir = EAST; dir < DIRECTION_MAX && mode == SETTING; dir++)
         {
-            if (new_second_flag)
+            for (color = RED; color < TRAFFIC_LIGHT_STATUS_MAX && mode == SETTING; color++)
             {
-                ToggleSegs(dir);
-                new_second_flag = 0;
+                while (mode == SETTING)
+                {
+                    if (SWITCH_KEY == 0)
+                    {
+                        DelayMS(100);
+                        if (SWITCH_KEY == 0)
+                            break;
+                    }
+                    if (new_second_flag_setting)
+                    {
+                        DisplayDigit(light_time[dir][color], dir);
+                        ToggleSegs(dir);
+                        new_second_flag_setting = 0;
+                    }
+                    if (UP_KEY == 0)
+                    {
+                        DelayMS(100);
+                        if (UP_KEY == 0)
+                            light_time[dir][color]++;
+                    }
+                    if (DOWN_KEY == 0)
+                    {
+                        DelayMS(100);
+                        if (DOWN_KEY == 0)
+                            light_time[dir][color]--;
+                    }
+                }
             }
-            if (UP_KEY == 0)
-            {
-            }
+            DisplayDigit(light_time[dir][RED], dir);
         }
     }
     ClockReset();       // 重置时钟
@@ -249,4 +275,17 @@ uchar GetDstLed(direction dir, TrafficLightColor color)
         break;
     }
     return dst_led;
+}
+
+void EmergencyMain()
+{
+}
+
+void LoadDefaultTime()
+{
+    // 加载初始状态各路口时间
+    light_time[EAST][RED] = 60, light_time[EAST][YELLOW] = 5, light_time[EAST][GREEN] = 15;
+    light_time[SOUTH][RED] = 60, light_time[SOUTH][YELLOW] = 5, light_time[SOUTH][GREEN] = 15;
+    light_time[WEST][RED] = 60, light_time[WEST][YELLOW] = 5, light_time[WEST][GREEN] = 15;
+    light_time[NORTH][RED] = 60, light_time[NORTH][YELLOW] = 5, light_time[NORTH][GREEN] = 15;
 }

@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   GLOBAL_VARS                                                       12/14/2022 15:03:41 PAGE 1   
+C51 COMPILER V9.60.0.0   GLOBAL_VARS                                                       12/14/2022 21:01:35 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE GLOBAL_VARS
@@ -10,7 +10,7 @@ line level    source
 
    1          #include "headfile.h"
    2          
-   3          uchar mode = DEBUGGING;
+   3          uchar mode = SETTING;
    4          ushort seconds = 0;      // 本周期经过的秒数
    5          ushort milliseconds = 0; // 毫秒数,为1000时令seconds++
    6          ushort cycle = 180;      // 红绿灯运行一轮的周期

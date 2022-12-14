@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 15:03:41 PAGE 1   
+C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 21:01:35 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE UTILITIES
@@ -46,87 +46,87 @@ line level    source
   35   3                  }
   36   2          }
   37   1          *timeout_flag = 1;
-  38   1      }
-  39          
-  40          void Hc595SendMultiByte(unsigned short dat)
-  41          {
-  42   1          /**
-  43   1           * @brief 向HC595发送数据，并并行输出；dat的高8位在第二块HC595（东边的三个灯
+  38   1          return in_status;
+  39   1      }
+  40          
+  41          void Hc595SendMultiByte(unsigned short dat)
+  42          {
+  43   1          /**
+  44   1           * @brief 向HC595发送数据，并并行输出；dat的高8位在第二块HC595（东边的三个灯
              -所在的那片），低8位在第一块HC595
-  44   1           */
-  45   1          uchar a;
-  46   1      
-  47   1          SRCLK = 1;
-  48   1          RCLK = 1;
-  49   1      
-  50   1          for (a = 0; a < sizeof(dat) * 8; a++) // 发送8位数
-  51   1          {
-  52   2              SER = dat >> ((sizeof(dat) * 8) - 1); // 从最高位开始发送
-C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 15:03:41 PAGE 2   
+  45   1           */
+  46   1          uchar a;
+  47   1      
+  48   1          SRCLK = 1;
+  49   1          RCLK = 1;
+  50   1      
+  51   1          for (a = 0; a < sizeof(dat) * 8; a++) // 发送8位数
+  52   1          {
+C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 21:01:35 PAGE 2   
 
-  53   2              dat <<= 1;
-  54   2      
-  55   2              SRCLK = 0; // 发送时序
-  56   2              _nop_();
+  53   2              SER = dat >> ((sizeof(dat) * 8) - 1); // 从最高位开始发送
+  54   2              dat <<= 1;
+  55   2      
+  56   2              SRCLK = 0; // 发送时序
   57   2              _nop_();
-  58   2              SRCLK = 1;
-  59   2          }
-  60   1          RCLK = 0;
-  61   1          _nop_();
+  58   2              _nop_();
+  59   2              SRCLK = 1;
+  60   2          }
+  61   1          RCLK = 0;
   62   1          _nop_();
-  63   1          RCLK = 1;
-  64   1      }
-  65          
-  66          unsigned short BinarySeries2ushort(uchar series[], uchar len)
-  67          {
-  68   1          /**
-  69   1           * @brief 将二进制序列数组转换为对应的十进制数
-  70   1           * @param series 高位在前的二进制序列
-  71   1           * @return 转换的十进制数
-  72   1           */
-  73   1          // TODO implement this
-  74   1          static ushort ret;
-  75   1          static uchar i;
-  76   1          for (i = 0, ret = 0; i < len; i++)
-  77   1          {
-  78   2              ret += (series[i] << i);
-  79   2          }
-  80   1      
-  81   1          return ret;
-  82   1      }
-  83          
-  84          void SetLedBit(LEDs led, bit status)
-  85          {
-  86   1          /**
-  87   1           * @brief 设置某位LED的状态。这是唯一允许的操作LED的方式。
-  88   1           * @param led 枚举类型变量，操作的LED位
-  89   1           */
-  90   1          led_status[led] = status;
-  91   1          Hc595SendMultiByte(
-  92   1              BinarySeries2ushort(led_status,
-  93   1                                  sizeof(led_status) / sizeof(led_status[0])));
-  94   1      }
-  95          
-  96          void ToggleLedBit(LEDs led)
-  97          {
-  98   1          /**
-  99   1           * @brief 翻转led
- 100   1           * @warning 注意输入变量是否为LEDs枚举变量
- 101   1           */
- 102   1          led_status[led] = !led_status[led];
- 103   1          Hc595SendMultiByte(
- 104   1              BinarySeries2ushort(led_status,
- 105   1                                  sizeof(led_status) / sizeof(led_status[0])));
- 106   1      }
-*** WARNING C291 IN LINE 38 OF utilities.c: not every exit path returns a value
+  63   1          _nop_();
+  64   1          RCLK = 1;
+  65   1      }
+  66          
+  67          unsigned short BinarySeries2ushort(uchar series[], uchar len)
+  68          {
+  69   1          /**
+  70   1           * @brief 将二进制序列数组转换为对应的十进制数
+  71   1           * @param series 高位在前的二进制序列
+  72   1           * @return 转换的十进制数
+  73   1           */
+  74   1          // TODO implement this
+  75   1          static ushort ret;
+  76   1          static uchar i;
+  77   1          for (i = 0, ret = 0; i < len; i++)
+  78   1          {
+  79   2              ret += (series[i] << i);
+  80   2          }
+  81   1      
+  82   1          return ret;
+  83   1      }
+  84          
+  85          void SetLedBit(LEDs led, bit status)
+  86          {
+  87   1          /**
+  88   1           * @brief 设置某位LED的状态。这是唯一允许的操作LED的方式。
+  89   1           * @param led 枚举类型变量，操作的LED位
+  90   1           */
+  91   1          led_status[led] = status;
+  92   1          Hc595SendMultiByte(
+  93   1              BinarySeries2ushort(led_status,
+  94   1                                  sizeof(led_status) / sizeof(led_status[0])));
+  95   1      }
+  96          
+  97          void ToggleLedBit(LEDs led)
+  98          {
+  99   1          /**
+ 100   1           * @brief 翻转led
+ 101   1           * @warning 注意输入变量是否为LEDs枚举变量
+ 102   1           */
+ 103   1          led_status[led] = !led_status[led];
+ 104   1          Hc595SendMultiByte(
+ 105   1              BinarySeries2ushort(led_status,
+ 106   1                                  sizeof(led_status) / sizeof(led_status[0])));
+ 107   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    273    ----
+   CODE SIZE        =    275    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 15:03:41 PAGE 3   
+C51 COMPILER V9.60.0.0   UTILITIES                                                         12/14/2022 21:01:35 PAGE 3   
 
    DATA SIZE        =     15       8
    IDATA SIZE       =   ----    ----
@@ -134,4 +134,4 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
